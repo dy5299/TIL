@@ -68,6 +68,70 @@ Pandas는 CSV, 텍스트, Excel, SQL, HTML, JSON 등 다양한 데이터 파일�
 df=pd.read_csv('example.csv 파일의 경로')
 ```
 
+### 6) 판다스 분포
+
+이항분포, 정규분포, 카이제곱분포
+
+```python
+import pandas as pd
+import numpy as np
+
+# 0.5의 확률로 1번 시도했을 경우
+# 성공한 횟수를 나타냄 (binomial distribution)
+binom = np.random.binomial(1, 0.5)
+print(binom)
+# 0
+
+# 0.5의 확률로 1000번 시도해서 성공한 비율
+binom_possible = np.random.binomial(1000, 0.5)/1000
+print(binom_possible)
+# 0.509
+
+# 0-1 사이의 값 중 하나를 반환
+uniform = np.random.uniform(0,1)
+print(uniform)
+# 0.017569841468665137
+
+# normal distribution의 값 중 하나를 반환
+norm = np.random.normal(0)
+print(norm)
+# -0.01514817076947644
+
+# mean=0.75인 normal distribution 의 표본 1000개를 뽑고
+# 그 표본의 표준편차를 구함
+distribution = np.random.normal(0.75, size=1000)
+np_std = np.std(distribution)
+print(np_std)
+# 1.0138256135609354
+
+import scipy.stats as stats
+# 첨도를 계산
+kurto = stats.kurtosis(distribution)
+print(kurto)
+# -0.04864969368079697
+
+# 쳐짐을 계산
+skew = stats.skew(distribution)
+print(skew)
+# 0.14249808939585273
+
+chi_squared_df2 = np.random.chisquare(2, size=10000)
+skew = stats.skew(chi_squared_df2)
+print(skew)
+# 1.9495243299128926
+
+chi_squared_df5 = np.random.chisquare(5, size=10000)
+skew = stats.skew(chi_squared_df5)
+print(skew)
+# 1.2211123354349391
+```
+
+
+
+
+
+
+
 # 2. 넘파이(Numpy)
 
 ```bash
