@@ -12,20 +12,25 @@ def hello():
 
 @app.route('/hi', methods=['POST'])
 def hi():
-    return {
+    a={
         "version" : "2.0",
         "templete" : {
             "outputs" : [
                 {
                     "simpleText":{
-                        "text" : "간단한 텍스트 요소입니다."
+                        "text" : "반가워~(발그레)"
                     }
                 }
             ]
         }
     }
+    print(a)
+    return a
 
 
 
-if __name__ == "__main__":              
-    app.run(host="127.0.0.1", port="5000")
+
+
+
+#if __name__ == "__main__":              
+#    app.run(host="127.0.0.1", port="5000")
