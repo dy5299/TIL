@@ -116,14 +116,13 @@ def namecard():
                         "carousel":{
                             "type" : "basicCard",
                             "items": [
-                                for i in range(len(db)) :
-                                    {
-                                        "title":"명함 n번째",
-                                        "description":info,
-                                        "thumbnail":{
-                                            "imageUrl":image_url
-                                        },
+                                {
+                                    "title":"이번에 인식한 명함입니다",
+                                    "description":info,
+                                    "thumbnail":{
+                                        "imageUrl":image_url
                                     },
+                                },
                             ]
                         }
                     }
@@ -160,7 +159,28 @@ def cardlist():
     idx+=1
     db[ImgURL].append(image_url)
     db[INFO].append(info)
-    return body
+    return {
+            "version":"2.0",
+            "template":{
+                "outputs":[
+                    {
+                        "carousel":{
+                            "type" : "basicCard",
+                            "items": [
+                                for i in range(len(db)) :
+                                    {
+                                        "title":"명함 n번째",
+                                        "description":info,
+                                        "thumbnail":{
+                                            "imageUrl":image_url
+                                        },
+                                    },
+                            ]
+                        }
+                    }
+                ]
+            }
+        }
 
 
 
