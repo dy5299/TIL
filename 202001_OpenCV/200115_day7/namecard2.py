@@ -7,6 +7,10 @@ import matplotlib.pylab as plt
 import pytesseract
 from pandas import DataFrame as df
 pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
+import json
+from collections import OrderedDict
+
+
 
 app = Flask(__name__)
 
@@ -159,6 +163,14 @@ def cardlist():
     idx+=1
     db[ImgURL].append(image_url)
     db[INFO].append(info)
+
+
+    db_json = OrderedDict()
+    
+    db_json["items"] = 
+
+
+    
     return {
             "version":"2.0",
             "template":{
@@ -168,6 +180,7 @@ def cardlist():
                             "type" : "basicCard",
                             "items": [
                                 for i in range(len(db)) :
+                                    temp_list = 
                                     {
                                         "title":"명함 n번째",
                                         "description":info,
