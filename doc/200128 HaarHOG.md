@@ -420,6 +420,8 @@ cell은 C개의 클래스 확률로 구성 박스
 
 각 cell마다 box configuration(t_x, t_y, t_w, t_h), p0(c, object일 확률), pi(class별 확률) 파라미터를 가진다.
 
+t_x, t_y, t_w, t_h 을 예측해야 하는데.. 그 값이 0~1 실수. regression problem. (not classification)
+
 각 셀에 confidence (some object일 확률)
 
 bounding box : 2개(YOLO ver.2) (3개 in ver.3)
@@ -427,6 +429,16 @@ bounding box : 2개(YOLO ver.2) (3개 in ver.3)
 
 
 box 제거: object confidence 낮은 것 제거 ->  사각형 합치는.. Non-Maximum Suppresision (NMS:opencv에 구현되어 있음)
+
+
+
+기존 건 window가 중첩될 수 밖에 없는데
+
+YOLO는 window를 grid 단위로 넣어줘서 중첩이 안 된다. 횟수가 적다 -> faster
+
+
+
+(*) 모든 신경망 알고리즘은 경사하강법 사용하는 거야. 한 가지 방법밖에 없어
 
 
 
@@ -549,7 +561,7 @@ net.setPreferableTarget(cv2.dnn.DNN_TARGET_CPU)
 ​	(harris corner에서의 여러 개 엣지 나온 다음에 좋은 코너값 보기 이해, 주변보다 값이 낮거나 높은 것만 뽑는 것과 같다.)
 
 - size of network's input image: is fixed as 416 x 416 in YOLO ver.3
-  (YOLO network)
+  (YOLO network, NOT size of image)
 
 - variable은 confThreshold, nmsThreshold 두 개.
 
@@ -626,7 +638,7 @@ YOLO는 출력 레이어가 세 개이다. (이전까지는 하나였는데)
 
 `net.getLayerNames()` 모든 레이어들 출력
 
-`net.getUnconnectedOutLayers()` 끊긴(output) 레이어들 출력
+`net.getUnconnectedOutLayers()` 연결이 끊긴 레이어들(output layers) 출력
 
 ```python
 [[200]
@@ -637,6 +649,80 @@ YOLO는 출력 레이어가 세 개이다. (이전까지는 하나였는데)
 `net.getUnconnectedOutLayers().i` : [200]
 
 `net.getUnconnectedOutLayers().i[0]` : 200
+
+```python
+cap = cv2.VideoCapture('200128_dark/dog.jpg')
+
+hasFrame, frame = cap.read()
+
+#inpWidth =  frame.shape[1]
+#inpHeight = frame.shape[0]
+# 여기서 inpWidth는 영상의 크기가 아님.
+blob = cv2.dnn.blobFromImage(frame, 1/255, (inpWidth, inpHeight), [0,0,0], 1, crop=False)
+
+net.setInput(blob)
+
+outs = net.forward(getOutputsNames(net))
+
+postprocess(frame, outs)
+
+t, _ = net.getPerfProfile()
+label = 'Inference time: %.2f ms' % (t * 1000.0 / cv2.getTickFrequency())
+cv2.putText(frame, label, (0, 15), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255))
+```
+
+weights file: keras에서 .pb 파일로 저장하면 tensorflow에서 사용 가능하다.
+
+`net.forward(레이어 이름)` 출력값
+
+- `cv2.dnn.blobFromImage(frame, 1/255, (inpWidth, inpHeight), [0,0,0], True, crop=False)`
+
+  `net.setInput(blob)`
+
+  무조건 float type. 영상뿐만 아니라 보편적인 input을 처리하는 함수이다. (numpy type)
+
+  영상은 보통 4차원 (개수,폭,높이,채널수) 를 출력하면 순서가 바뀌어있어 `(1,3,416,416)`
+
+  ​	NHWC -> NCHW (number, channel, height, width)
+
+  `1/255` : scale factor. cuz darknet 데이터는 내부에서 이미 0~1로 내부적으로 normalized
+
+  `[0,0,0]` : 평균 이동 factor
+
+  `swapRB=True`: opencv에서는 주로 true로 주는게 맞아. 이미지를 RGB순서로 swap하여 넣어달라.
+
+  channel first / channel last
+
+```python
+type(outs)	#list
+len(outs)	#3
+
+outs[0].shape	# (507, 85)
+outs[1].shape	# (2028,85)
+outs[2].shape	# (8112,85)
+```
+
+- outs : prediction 결과. bounding box의 값.
+
+predict: network에 흘려보내라는 의미. not only 예측하라/ just 계산하라
+
+첫번째 박스는 507 boxex 있다.
+
+507=grids 13 * 13 * 3 bounding boxes
+
+85 = 80 classes + 5 parameters
+
+
+
+
+
+
+
+
+
+
+
+
 
 ## YOLO Installation
 
