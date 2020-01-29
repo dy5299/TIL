@@ -32,7 +32,7 @@ Cascade Decision Process : simple binary classifier. 고속으로 분류
 
 
 
-## haarhog
+## 1. haar-like
 
 ```python
 import cv2, numpy as np
@@ -151,9 +151,15 @@ imshow('src', src)
 
 최근의 CNN base face detector 나오기 전까지는 위의 알고리즘이 시장 장악할 정도로 주요 알고리즘이었다.
 
-# HOG
+## 2. HOG
 
 Histogram of Oriented Gradients
+
+not weak classifier. SVM이라는 strong classifier 사용.
+
+haar-like와는 완전 반대방향.
+
+
 
 처음) CCTV에서 사람 검출... 
 
@@ -186,13 +192,21 @@ SVM: 분류할 수 있는 최전선 벡터: support vector: 전체의 10-15%. �
 
 -> HOG 기본 라이브러리에 내장시킴
 
-# ORB
+## 3. ORB
 
 Oriented FASTand Rotated BRIEF
 
 FAST-9 을 이용하여 특징점을 검출한 후 나름의 방법(Intensity Centroid)으로 특징점의 방향(orientation)을 계산
 
 
+
+본 거는 잘 찾는데, 일반적인 것은 못 찾아.
+
+특징점이 정확히 같아야 해. (어떻게 보면 제약적)
+
+보편적인 얼굴, 사람, 강아지를 찾아주세요 -> 부적합.
+
+도메인 별로 가정해야 할 것이 있다.
 
 
 
@@ -262,7 +276,7 @@ affine: 2d transformation
 
 perspective: 3d transformation
 
-## scene에서 object 찾기
+### scene에서 object 찾기
 
 ```python
 def findBook(query,scene):
@@ -302,7 +316,35 @@ imshow("",s)
 
 
 
-### LBS (Location-based Service)
+
+
+
+
+## 4. YOLO
+
+굉장히 잘 검출된다.
+
+size, 비율 상관없이 잘 뽑는다.
+
+동영상에서 테스트할 경우 극명하게 테스트 가능하다. 자율주행이 핫이슈라 자율주행 영상에 테스트해봐.
+
+30 frames 스킵해가며 1초에 한 번 정도만 detection하면 되겠지.
+
+
+
+새로운.. 많이 다를거야.
+
+YOLO에서 주는 건 제한적. 네트웍 통과시킨 결과만 줘.
+
+그래도 획기적인 알고리즘.
+
+
+
+
+
+
+
+# LBS (Location-based Service)
 
 마케팅 수단으로 주목받는 분야
 
@@ -322,15 +364,4 @@ imshow("",s)
 
 YOLO: PC에서 트레이닝 불가 (최대cpu 다 사용)
 
-# AWS
-
-
-
-# YOLO
-
-굉장히 잘 검출된다.
-
-size, 비율 상관없이 잘 뽑는다.
-
-동영상에서 테스트할 경우 극명하게 테스트 가능하다. 자율주행이 핫이슈라 자율주행 영상에 테스트해봐.
 
