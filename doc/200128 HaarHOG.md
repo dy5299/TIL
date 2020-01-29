@@ -332,6 +332,10 @@ size, 비율 상관없이 잘 뽑는다.
 
 
 
+YOLO: PC에서 트레이닝 불가 (최대cpu 다 사용)
+
+
+
 새로운.. 많이 다를거야.
 
 YOLO에서 주는 건 제한적. 네트웍 통과시킨 결과만 줘.
@@ -362,6 +366,192 @@ YOLO에서 주는 건 제한적. 네트웍 통과시킨 결과만 줘.
 
 
 
-YOLO: PC에서 트레이닝 불가 (최대cpu 다 사용)
+(200129)
 
+Semantic Segmentation to Instance Segmentation
+
+Semantic Image Segmentation의 목적은 사진에 있는 모든 픽셀을 해당하는 (미리 지정된 개수의) class로 분류하는 것입니다. 이미지에 있는 모든 픽셀에 대한 예측을 하는 것이기 때문에 dense prediction 이라고도 불립니다.
+
+
+
+# YOLO
+
+기존에 detection 오래 걸린 이유: full scanning
+
+YOLO는 scanning 기법을 안 쓰고
+
+YOLO는 네트워크의 최종 출력단에서 경계박스를 위치 찾기와 클래스 분류가 동시에 이뤄진다.
+
+단 하나의 네트워크가 한번에 특징도 추출하고, 경계박스도 만들고, 클래스도 분류한다.
+
+그러므로 간단하고 빠르다
+
+## 소요시간 비교
+
+R-CNN (20s): 영상에서 object가 있을 만한 좋은 위치를 찾아. (edge 기반으로) -> 그곳을 CNN (검색범위 줄음
+
+Fast R-CNN (0.5fps)
+
+Faster R-CNN (7-8fps)
+
+YOLO (45fps, 155fps)
+
+
+
+R-CNN은 region proposal이라는 수백개의 이미지 후보를 생성하고 각각의-
+
+YOLO: 격자 그리드로 나누어 한번에 클래스를 판단하고 이를 통합해 최종 객체를 구분한다.
+
+기존의 방법들과 달리 object detection을 이미지 픽셀 좌표에 대응되는 bounding box을 찾는다.
+
+이에 대한 class 확률을 구하는 single regression problem으로 해결한다.
+
+## 알고리즘
+
+Input image를 S X S grid로 분할 (해당 셀에 물체의 중심 위치로 가정)
+
+cell은 B개의 bounding box와 각 객체 존재에 대한 confidence score로 구성
+
+cell은 C개의 클래스 확률로 구성 박스
+
+결과적으로 마지막 rpediction layer는 S x S x (B * 5 + C) 사이즈가 된다.
+
+
+
+각 cell마다 box configuration(t_x, t_y, t_w, t_h), p0(c, object일 확률), pi(class별 확률) 파라미터를 가진다.
+
+각 셀에 confidence (some object일 확률)
+
+bounding box : 2개(YOLO ver.2) (3개 in ver.3)
+
+
+
+box 제거: object confidence 낮은 것 제거 ->  사각형 합치는.. Non-Maximum Suppresision (NMS:opencv에 구현되어 있음)
+
+
+
+![YOLO 네트워크의 2가지 출력](images/200129_model_2.png)
+
+좌측의 입력 영상이 네트워크를 통과하면 중앙의 2개의 데이터를 얻는다.
+
+이것이 네트워크의 최종 출력이다.
+
+이안에는 수많은 경계 박스들과 영상을 7x7그리드로 나눴을 때 해당 그리드 셀안에는 어떤 클래스가 있는지에 대한 정보(위 중앙 그림 2개)가 인코딩되어 있다.
+
+우측의 이미지는 네트워크의 최종 출력물을 이용해 생성하는 것으로 네트워크가 직접 생성한 것이 아니다.
+
+가운데 위쪽은 경계 박스에 대한 정보이다. 서로 다른 크기의 상당히 많은 경계박스들이 그려져 있다.
+
+복잡해보여서 언뜻 봐서는 뭐가 뭔지 알 수가 없는것 같다.
+
+네트워크는 영상을 7x7 그리드로 나눈다. 각 그리드에서 중심을 그리드 안쪽으로 하면서 크기가 일정하지 않은 경계박스를 2개씩 생성한다.
+
+그리드 셀이 7 * 7 = 49 개이므로 경계 박스는 총 98개가 만들어 진다.
+
+ 
+
+이 중 경계 박스 안쪽에 어떤 오브젝트가 있을 것 같다고 확신(confidence score)할수록 박스를 굵게 그려준다.
+
+굵은 경계 박스들만 남기고 얇은 경계박스(어떤 오브젝트도 없는 것 같다고 생각되는 것들) 을 지운다.
+
+남은 후보 경계 박스들을 NMS(Nom-maximal suppression 비-최대값 억제) 알고리즘를 이용해 선별하면 우측의 이미지 처럼 3개만 남게 된다.
+
+남은건 경계 박스의 색깔이다. 
+
+경계 박스의 색깔은 클래스를 의미한다. 
+
+중앙의 아래쪽에 이미지가 7x7 의 격자(그리드)로 분할되어 총 49개의 그리드 셀이 만들어졌다.
+
+각 그리드 셀은 해당 영역에서 제안한(proposal) 경계 박스안의 오브젝트가 어떤 클래스인지를 컬러로 표현하고 있다.
+
+그러므로 최종적으로 남은 3개의 경계 박스 안에 어떠한 클래스가 있는지 알 수 있다.
+
+그래서 우측의 최종 결과를 얻는다.
+
+네트워크가 생성하는 경계박스의 숫자는 그리드 셀의 2배이다. 
+
+그리드 셀이 49개이므로 경계 박스는 총 98개가 만들어 진다.
+
+ROI 혹은 오브젝트 후보라고 할 수 있는 이 경계박스들은 스레시홀드(0.5)보다 작으면 지워준다.
+
+![네트워크 구조](images/200129_network0.png)
+
+네트워크 구조는 직선적이다. 
+
+GoogleLeNet을 약간 변형시켜서 특징 추출기로 사용했다.
+
+이후 컨볼루션 레이어 4회, 풀 커넥션 레이어 2번 하고 사이즈를 7x7x30으로 조정하면 끝난다.
+
+이 마지막 특징 데이터 7x7x30 가 바로 예측 결과이며 이 안에 경계박스와 클래스 정보 등 모든 것이 들어 있다.
+
+무엇이 들어있는지 자세히 보자.
+
+![네트워크 예측](images/200129_last0.png)
+
+왼쪽 빨간점으로 표시한 부분은 7x7 그리드셀중에 하나로 이미지에서 개의 중앙 부분에 해당한다.
+
+그리고 빨간색 박스보다 큰 **노란색 박스**가 바로 빨간색 그리드셀에서 예측한 경계 박스이다.
+
+ 
+
+7x7 은 영상을 7x7 의 격자로 나눈것이다.
+
+30개의 채널은 (경계 박스의 정보 4개 , 경계 박스안에 오브젝트가 있을 확률(confidence)) x 2, 어떤 클래스일 확률 20개 로 구성된다.
+
+경계 박스 정보 x, y : 노란색 경계 박스의 중심이 빨간 격자 셀의 중심에서 어디에 있는가.
+
+경계 박스 정보 w,h : 노란색 경계 박스의 가로 세로 길이가 전체 이미지 크기에 어느 정도 크기를 갖는가
+
+만약 경계박스가 위의 그림처럼 되었다면 x,y는 모두 0.5 정도이고 w,h는 각각  2/7, 4/7 정도가 될 것이다.
+
+노란색 경계 박스는 반드시 그 중심이 빨간 그리드 셀 안에 있어야 하며, 가로와 세로길이는 빨간 그리드 셀보다 작을 수도 있고 그림처럼 클 수도 있다.
+
+또한 정사각형일 필요도 없다.
+
+빨간 그리드 셀 내부 어딘가를 중심으로 하여 근처에 있는 어떤 오브젝트를 둘러싸는 직사각형의 노란색 경계 박스를 그리는 것이 목표이다.
+
+노란색 경계 박스가 바로 ROI , 오브젝트 후보이다.
+
+이것을 2개 만든다.
+
+## Code
+
+```python
+# Initialize the parameters
+confThreshold = 0.5  #Confidence threshold
+nmsThreshold = 0.4   #Non-maximum suppression threshold
+inpWidth = 416       #Width of network's input image
+inpHeight = 416      #Height of network's input image
+
+# Load names of classes
+classesFile = "200128_dark/coco.names"
+classes = None
+with open(classesFile, 'rt') as f:
+    classes = f.read().rstrip('\n').split('\n')
+print(classes)
+# Give the configuration and weight files for the model and load the network using them.
+modelConfiguration = "200128_dark/yolov3.cfg"
+modelWeights = "../../../../yolov3.weights"
+
+net = cv2.dnn.readNetFromDarknet(modelConfiguration, modelWeights)
+net.setPreferableBackend(cv2.dnn.DNN_BACKEND_OPENcv2)
+net.setPreferableTarget(cv2.dnn.DNN_TARGET_CPU)
+```
+
+- Confidence threshold (c): object일 확률
+
+- NMS threshold: 거리가 얼마나 떨어져있냐
+
+​	주변보다 상대적으로 값이 높거나 낮은 값만 선택.
+
+​	local maximum/minimum value만 뽑겠다는 것.
+
+​	(harris corner에서의 여러 개 엣지 나온 다음에 좋은 코너값 보기 이해, 주변보다 값이 낮거나 높은 것만 뽑는 것과 같다.)
+
+- size of network's input image: is fixed as 416 x 416 in YOLO ver.3
+  (YOLO network)
+- variable은 confThreshold, nmsThreshold 두 개.
+- YOLO에서 필요한 파일은 Model Configuration, Model Weights 두 개.
+
+## YOLO Installation
 
