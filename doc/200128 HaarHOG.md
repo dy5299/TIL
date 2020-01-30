@@ -714,15 +714,41 @@ predict: network에 흘려보내라는 의미. not only 예측하라/ just 계�
 
 
 
-
-
-
-
-
-
-
-
-
+(200130)
 
 ## YOLO Installation
+
+내부적으로는 전이학습까지 시키는 것이다.
+
+training 전 classification 필요하겠지
+
+training 시 predefined weights 필요
+
+
+
+- Visual C++ 설치
+- OpenCV 설치
+- YOLO 설치
+- https://github.com/AlexeyAB/darknet
+- git clone https://github.com/AlexeyAB/darknet
+- 학습된 가중치
+- https://pjreddie.com/darknet/yolo/
+
+
+
+configuration 에서 세 군데 설정
+
+- batch, subdivisions
+- filters = (classes + 5) * 3
+- classes
+
+yolo 가 총 3군데 있다. yolo 내의 classes와 그 위의 filter 수를 변경하는 작업을 세 번 반복한다.
+
+
+
+```bash
+#anaconda 해당 경로로 들어가서
+darknet_no_gpu detector train darknet.data darknet-yolov3.cfg
+darknet53.conv.74 > snowman.log
+```
 
