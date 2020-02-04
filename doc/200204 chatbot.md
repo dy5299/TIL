@@ -84,18 +84,35 @@ Fallback intent 는 말 그대로 사용자의 대화가 어떤 intent 와도 �
 
 문맥을 jump할 수 있는 기능
 
-## 챗봇 생성 실습
+## 챗봇 실습
 
-Create agent - 챗봇 하나. 이름은 영어로 써야 코딩 시 편리
+- agent 생성
 
-Intents - training : 어순, 시간, 장소 등은 알아서 학습.
+Create agent - 챗봇 하나 단위이다. 이름은 영어로 써야 코딩 시 편리하다.
 
-integrations - Web Demo abled
+Intents - training : 어순, 시간, 장소 등은 구글이 알아서 학습한다.
 
+integrations - Web Demo abled 웹 테스트 용이
 
+- parameter 이용
 
 Responses 에서 parameter 받아오기 : `$food`
 
 부모 context의 parameter 가져오기 : `#orderfood-custom-followup.food`
 
 부모가 아닌 context 끌고 오기 : input context 에 참조할 context 추가 후 `#order_food-followup.name`
+
+- 복합 entity (pairing)
+
+synonyms 체크 해제
+
+`@food:food` 앞: 다른 entity 이름, 뒤: 파라미터명
+
+`@food:food @sys.number-integer:number-integer ` : 복합 entities
+
+parameter 의 IS LIST 속성을 ON시키면 다음과 같은 복합 entities, 리스트 형태로 반환 가능하다. JSON 형태로 반환된다.
+
+```bash
+[ { "food": "짜장면", "number-integer": 2 }, { "number-integer": 2, "food": "짬뽕" } ]
+```
+
