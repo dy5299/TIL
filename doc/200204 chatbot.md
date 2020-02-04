@@ -116,3 +116,219 @@ parameter 의 IS LIST 속성을 ON시키면 다음과 같은 복합 entities, �
 [ { "food": "짜장면", "number-integer": 2 }, { "number-integer": 2, "food": "짬뽕" } ]
 ```
 
+- 숫자 생략 시
+
+짜장면, 짬뽕 2개
+
+```bash
+[ { "food": "짜장면" }, { "food": "짬뽕", "number-integer": 2 } ]
+```
+
+### python 연동 - openAPI
+
+python 연동에는 두 가지 방법 있다. openAPI 이용하여 갖다 쓰는 방법과, fullfillment 통해서 - 필요한 logic만 집어넣는 방식
+
+get 방식은 보안 문제가 있다. 주소에 query string 담겨있다. 브라우저에서 호출할 수 있다.
+
+post 방식은 브라우저에서 호출할 수 없다.
+
+코딩으로는 둘 다 호출 가능하다.
+
+```python
+import requests
+import json
+
+def get_answer(text, sessionId):
+    data_send = {
+        'query': text, 'sessionId': sessionId,
+        'lang': 'ko', 'timezone' : 'Asia/Seoul'
+    }
+    data_header = {
+        'Authorization': 'Bearer 420208382d5046eb89a9e1fa3e31e4cb',
+        'Content-Type': 'application/json; charset=utf-8'
+    }
+
+    dialogflow_url = 'https://api.dialogflow.com/v1/query?v=20150910'
+    res = requests.post(dialogflow_url, data=json.dumps(data_send), headers=data_header)
+    if res.status_code == requests.codes.ok:
+        return res.json()    
+    return {}
+
+dict = get_answer("부산 내일 날씨 어때", 'user01')
+answer = dict['result']['fulfillment']['speech']
+print("Bot:" + answer)
+```
+
+- requests.post
+
+`requests.post(dialogflow_url, data=json.dumps(data_send), headers=data_header)`
+
+html 주소, content(name value 상의 데이터):일반적인 문자형태, header:dictionary 형태
+
+```python
+res = requests.get("http://www.naver.com")
+print(res)
+print(type(res))    #객체
+print(res.text)
+```
+
+```bash
+<Response [200]>
+<class 'requests.models.Response'>
+~html내용~
+```
+
+- JSON print
+
+```python
+data_send = {
+    'query': '부산 날씨 어때', 
+    'sessionId': 'user01',
+    'lang': 'ko', 
+    'timezone' : 'Asia/Seoul'
+}
+data_header = {
+    'Authorization': 'Bearer 420208382d5046eb89a9e1fa3e31e4cb',
+    'Content-Type': 'application/json; charset=utf-8'
+}
+
+dialogflow_url = 'https://api.dialogflow.com/v1/query?v=20150910'
+res1 = requests.post(dialogflow_url, data=json.dumps(data_send), headers=data_header)
+    
+print(res1.text)
+```
+
+```json
+{
+  "id": "beedc765-1063-43d9-b9fe-9c9ed4926898-ce609cdc",
+  "lang": "ko",
+  "sessionId": "user01",
+  "timestamp": "2020-02-04T07:39:51.96Z",
+  "result": {
+    "source": "agent",
+    "resolvedQuery": "부산 날씨 어때",
+    "action": "",
+    "actionIncomplete": true,
+    "score": 0.57886386,
+    "parameters": {
+      "geo-city": "부산광역시",
+      "date": ""
+    },
+    "contexts": [
+      {
+        "name": "d9f7e7fa-f1f4-4e72-82fc-d3cc87a5c050_id_dialog_context",
+        "lifespan": 2,
+        "parameters": {
+          "geo-city": "부산광역시",
+          "geo-city.original": "부산",
+          "date": "",
+          "date.original": ""
+        }
+      },
+      {
+        "name": "weather_dialog_context",
+        "lifespan": 2,
+        "parameters": {
+          "geo-city": "부산광역시",
+          "geo-city.original": "부산",
+          "date": "",
+          "date.original": ""
+        }
+      },
+      {
+        "name": "weather_dialog_params_date",
+        "lifespan": 1,
+        "parameters": {
+          "geo-city": "부산광역시",
+          "geo-city.original": "부산",
+          "date": "",
+          "date.original": ""
+        }
+      },
+      {
+        "name": "__system_counters__",
+        "lifespan": 1,
+        "parameters": {
+          "no-input": 0.0,
+          "no-match": 0.0,
+          "geo-city": "부산광역시",
+          "geo-city.original": "부산",
+          "date": "",
+          "date.original": ""
+        }
+      }
+    ],
+    "metadata": {
+      "intentId": "d9f7e7fa-f1f4-4e72-82fc-d3cc87a5c050",
+      "intentName": "weather",
+      "webhookUsed": "false",
+      "webhookForSlotFillingUsed": "false",
+      "isFallbackIntent": "false"
+    },
+    "fulfillment": {
+      "speech": "날짜가 빠졌습니다",
+      "messages": [
+        {
+          "type": 0,
+          "speech": "날짜가 빠졌습니다"
+        }
+      ]
+    }
+  },
+  "status": {
+    "code": 200,
+    "errorType": "success"
+  }
+}
+```
+
+- 필요한 값 출력해보기
+
+```python
+data_send = {
+    'query': '부산 날씨 어때', 
+    'sessionId': 'user01',
+    'lang': 'ko', 
+    'timezone' : 'Asia/Seoul'
+}
+data_header = {
+    'Authorization': 'Bearer 420208382d5046eb89a9e1fa3e31e4cb',
+    'Content-Type': 'application/json; charset=utf-8'
+}
+
+dialogflow_url = 'https://api.dialogflow.com/v1/query?v=20150910'
+res1 = requests.post(dialogflow_url, data=json.dumps(data_send), headers=data_header)
+
+result = res1.json()
+print('intentName: ', result['result']['metadata']['intentName'])
+print('actionIncomplete: ', result['result']['actionIncomplete'])
+
+params = result['result']['parameters']
+for p in params:
+    print(p, params[p])
+```
+
+```bash
+#'query'='부산 날씨 어때'
+intentName:  weather
+actionIncomplete:  True
+geo-city 부산광역시
+date 
+---------------------------
+#'query'='오늘 부산 날씨 어때'
+intentName:  weather
+actionIncomplete:  False
+geo-city 부산광역시
+date 2020-02-04
+---------------------------
+#'query'='안녕'
+intentName:  Default Welcome Intent
+actionIncomplete:  False
+---------------------------
+#'query'='짜장면 2, 짬뽕 5'
+intentName:  orderfood2
+actionIncomplete:  False
+food_number [{'food': '짜장면', 'number-integer': 2.0}, {'food': '짬뽕', 'number-integer': 5.0}]
+```
+
+반환값이 list
