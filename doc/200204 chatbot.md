@@ -34,6 +34,10 @@ LG, 삼성같은 제조사가 들어올 수 있는 영역은 아님. 가격 경�
 
 
 
+phone gateway - 구글 AI 듀플렉스 : 전화를 대신 걸어주는 AI
+
+
+
 ## 챗봇의 장점 웹사이트에 비해
 
 - 챗봇은 자연어 기반으로 하기 때문에, 새로운 유저 인터페이스 학습이 필요없다.
@@ -49,14 +53,6 @@ LG, 삼성같은 제조사가 들어올 수 있는 영역은 아님. 가격 경�
 # Dialogflow
 
 챗봇 대부분은 알고리즘 보다는 데이터 추가 형식으로...
-
-## 챗봇 생성
-
-Create agent - 챗봇 하나. 이름은 영어로 써야 코딩 시 편리
-
-Intents - training : 어순, 시간, 장소 등은 알아서 학습.
-
-integrations - Web Demo abled
 
 ## 구성요소 설명
 
@@ -76,3 +72,30 @@ Fallback intent 는 말 그대로 사용자의 대화가 어떤 intent 와도 �
 
 ‘내일 오후 2시 되나요’ 에서 무엇을 위한 ‘내일 오후 2시’ 인가를 파악하기 위해서 전체 대화의 문맥을 사람이 이해하는 것처럼, 그 전에 대화가 되었던 ‘수리’ 라는 것을 기억하는 것을 의미합니다.
 
+### fullfillment
+
+명시한 서버를 거쳐와서 답변하는 방식이다.
+
+### integrations
+
+다양한 플랫폼과 연동하는 기능이다.
+
+### event
+
+문맥을 jump할 수 있는 기능
+
+## 챗봇 생성 실습
+
+Create agent - 챗봇 하나. 이름은 영어로 써야 코딩 시 편리
+
+Intents - training : 어순, 시간, 장소 등은 알아서 학습.
+
+integrations - Web Demo abled
+
+
+
+Responses 에서 parameter 받아오기 : `$food`
+
+부모 context의 parameter 가져오기 : `#orderfood-custom-followup.food`
+
+부모가 아닌 context 끌고 오기 : input context 에 참조할 context 추가 후 `#order_food-followup.name`
