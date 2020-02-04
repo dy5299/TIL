@@ -331,4 +331,4 @@ actionIncomplete:  False
 food_number [{'food': '짜장면', 'number-integer': 2.0}, {'food': '짬뽕', 'number-integer': 5.0}]
 ```
 
-반환값이 list
+반환값이 list [       안에 dictionary {}           ]
