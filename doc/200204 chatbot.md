@@ -332,3 +332,301 @@ food_number [{'food': '짜장면', 'number-integer': 2.0}, {'food': '짬뽕', 'n
 ```
 
 반환값이 list [       안에 dictionary {}           ]
+
+- 총 금액 계산
+
+```python
+#간단히
+import math
+costs = {"짜장면":5000, "짬뽕":10000,"탕수육":20000}
+
+while True :
+    txt = input("->")
+    dict = get_answer(txt, 'user01')
+    answer = dict['result']['fulfillment']['speech']
+    if dict['result']['metadata']['intentName'] == 'orderfood2' and dict['result']['actionIncomplete'] == False :
+        foodnum = dict['result']['parameters']['food_number']
+
+        totalcost = 0
+        for i in range(len(foodnum)) :
+            totalcost = totalcost + foodnum[i]['number-integer'] * costs[foodnum[i]['food']]
+        totalcost = math.floor(totalcost)
+
+        print("총 금액은 ", totalcost, "원 입니다.")
+    else :
+        print("Bot:" + answer)
+```
+
+
+
+(200205)
+
+# UI/UX
+
+UI는 인터페이스, 즉 정보기기나 소프트웨어의 화면 등 사람과 접하는 면을 설계하는 일이다.
+반면 **UX(사용자 경험)란 특정 정황과 목표를 갖는, 정보기기/서비스 사용자의 "느낌,태도,행동"을 말한다.**
+
+UI에서 U가 보편적 인간을 모델로 한 분석 대상이었다면, UX에서 U는 주관적 인간을 모델로 한 공감 대상이다.
+
+출처: https://story.pxd.co.kr/567 [pxd UX Lab.]
+
+
+
+제주도를 갈 수 있는 방법?
+
+UI : 가장 효율적인 방법을 찾는 것. 비행기
+
+UX : 상황에 따라 다를거야. 몇 시간 걸리더라도 아이유와 같이 가는 것. ~ apple 성공 요인
+
+# Practice - Fibonacci Sequence
+
+## recursive function
+
+했던 계산을 여러번 하기 때문에 시간이 오래 소요된다.
+
+```python
+def fibo(n):
+    if n<3 :
+        return 1
+    else :
+        return fibo(n-1) + fibo(n-2)
+
+print(fibo(45))	#1134903170		2분정도 걸림
+```
+
+## dictionary 이용
+
+캐시 메모리 컨셉으로 dictionary 를 사용할 수 있다.
+
+이미 계산된 것을 또 계산하지 않는다.
+
+```python
+pre = {1:1, 2:1}
+def fibo2(n) :
+    v = pre.get(n)
+    if v != None :
+        return v
+    else :
+        sum = fibo2(n-1) + fibo2(n-2)
+        pre[n] = sum
+        return sum
+```
+
+- using list
+
+```python
+def fibo(a1,a2,n) :
+    out = [a1,a2]
+    for i in range(1,n+1):
+        out.append(out[i]+out[i-1])
+
+    return out[n-1]
+
+print(fibo(1,1,40))
+```
+
+# 웹 정보 이용
+
+## WEB - HTTP Method (GET/POST)
+
+웹서버에 클라이언트의 data를 전송하기 위한 전송방법에는 GET 과 POST가 있다.
+
+GET 방식은 URL을 통해 data를 전송하고, POST 방식은 body를 통해 data를 전송한다.
+
+GET 방식은 전송 URL이 노출되어 보안에 취약하고 길이 제한이 있다.
+
+POST 방식은 길이 제한이 없다.
+
+## in Python
+
+- 파이썬 표준 패키지(beautifulsoup)를 이용
+
+- 한글이 url 코드로 인코딩 해야한다.
+
+https://search.naver.com/search.naver?query=%EB%B6%80%EC%82%B0%EA%B4%91%EC%97%AD%EC%8B%9C+%EB%82%A0%EC%94%A8
+
+### HTML Parsing
+
+```python
+import urllib, requests, json
+from bs4 import BeautifulSoup
+
+#1st method
+res = requests.get(url)
+html = res.text
+print(html)
+
+#2nd method
+html = urllib.request.urlopen(url).read()
+print(html)
+
+#3rd method - urllib.request 혹은 requests
+bs = BeautifulSoup(urllib.request.urlopen(url).read(), "html.parser")
+bs = BeautifulSoup(requests.get(url).text, "html.parser")
+print(bs.html)
+```
+
+방법 1과 2는 한글이 코드로 나올 수도 있다.
+
+반면 방법3처럼 BeautifulSoup 을 거치면 무조건 한글이 인코딩되어 출력된다.
+
+### selecting elements
+
+```python
+city = '부산광역시'
+url = 'https://search.naver.com/search.naver?query='
+url = url + urllib.parse.quote_plus(city + " 날씨")
+
+
+bs = BeautifulSoup(urllib.request.urlopen(url).read(), "html.parser")
+```
+
+#### findAll
+
+```python
+temp = bs.findAll("span", "todaytemp")
+desc = bs.findAll("p", "cast_txt")
+```
+
+findAll : BeautifulSoup 에서만 제공하는 비표준 방식으로 (태그, attribute;default:클래스) 이다. 문법 체계가 없다.
+
+#### CSS selector
+
+```python
+temp = bs.select('span.todaytemp')
+desc = bs.select('p.cast_txt')
+```
+
+select : CSS selector 라는 문법 체계가 있다. (DB의 SQL과 비슷한 컨셉)
+
+앞에 아무것도 없으면 태그, `.`은 클래스, `#`은 id, `nth-child(2)` 은 두 번째 자식 노드를 가리킨다.
+
+- selector 문법 예시 (full directory)
+
+```bash
+#main_pack > div.sc.cs_weather._weather > div:nth-child(2) > div.weather_box > div.weather_area._mainArea > div.today_area._mainTabContent > div.main_info > div > p > span.todaytemp
+```
+
+### 함수로 정의
+
+```python
+#함수로 정의
+def getWeather(city) :
+    url = 'https://search.naver.com/search.naver?query='
+    url = url + urllib.parse.quote_plus(city + " 날씨")
+    #url 요청
+    bs = BeautifulSoup(urllib.request.urlopen(url).read(), "html.parser")
+    #select
+    temp = bs.select('span.todaytemp')
+    desc = bs.select('p.cast_txt')
+    
+    return temp[0].text + '℃ / ' + desc[0].text
+
+getWeather('제주도')
+#result
+'1℃ / 흐림, 어제보다 4˚ 낮아요'
+```
+
+문자열로 리턴하는 것은 좋은 방법이 아니다. 함수 밖에서 가공할 수 없기 때문이다.
+
+함수 내에서 딕셔너리로 반환하면 추후 정보 가공이 용이하다.
+
+```python
+return temp[0].text + '℃ / ' + desc[0].text
+```
+
+### 최종
+
+```python
+#pf 최종
+def get_answer(text, sessionId):
+    data_send = {
+        'query': text, 'sessionId': sessionId,
+        'lang': 'ko', 'timezone' : 'Asia/Seoul'
+    }
+    data_header = {
+        'Authorization': 'Bearer 420208382d5046eb89a9e1fa3e31e4cb',
+        'Content-Type': 'application/json; charset=utf-8'
+    }
+
+    dialogflow_url = 'https://api.dialogflow.com/v1/query?v=20150910'
+    res = requests.post(dialogflow_url, data=json.dumps(data_send), headers=data_header)
+    
+    if res.status_code == requests.codes.ok:
+        return res.json()    
+    return {}
+
+
+def getWeather(city) :
+    url = 'https://search.naver.com/search.naver?query='
+    url = url + urllib.parse.quote_plus(city + " 날씨")
+    
+    bs = BeautifulSoup(urllib.request.urlopen(url).read(), "html.parser")
+    
+    temp = bs.select('span.todaytemp')
+    desc = bs.select('p.cast_txt')
+    
+    return {"temp":temp[0].text, "desc":desc[0].text}
+
+
+price = {"짜장면":5000, "짬뽕":10000,"탕수육":20000}
+
+while True :
+    txt = input("->")
+    dict = get_answer(txt, 'user01')
+    answer = dict['result']['fulfillment']['speech']
+    
+    
+    if dict['result']['metadata']['intentName'] == 'orderfood2' :
+        params = dict['result']['parameters']['food_number']
+    
+        output = [  food.get("number-integer", 1)*price[food["food"]] for food in params  ]
+        print(sum(output))
+        
+    elif dict['result']['metadata']['intentName'] == 'weather' and dict['result']['actionIncomplete'] == False :
+        date = dict['result']['parameters']['date']
+        geo_city= dict['result']['parameters']['geo-city']
+        
+        info = getWeather(geo_city)
+        
+        print(f"{date}의 {geo_city} 날씨정보 : {info['temp']} ℃ / {info['desc']}")
+        
+    else :
+        print("Bot:" + answer)
+```
+
+```bash
+#result
+->오늘 부산 날씨
+2020-02-05의 부산광역시 날씨정보 : 3 ℃ / 맑음, 어제보다 6˚ 낮아요
+
+->오늘 날씨
+Bot:어느 도시의 날씨를 알고 싶으신가요?
+->서울
+2020-02-05의 서울특별시 날씨정보 : -6 ℃ / 맑음, 어제보다 10˚ 낮아요
+
+->제주도 날씨
+Bot:날짜가 빠졌습니다
+->내일
+Bot:어느 도시의 날씨를 알고 싶으신가요?
+->제주도
+Bot:도시를 알려주세요
+->제주
+2020-02-06의 제주시 날씨정보 : 3 ℃ / 흐림, 어제보다 4˚ 낮아요
+```
+
+### 지식백과 결과
+
+```python
+def getQuery(word) :
+    url = 'https://search.naver.com/search.naver?where=kdic&query='
+    url = url + urllib.parse.quote_plus(word)
+    
+    bs = BeautifulSoup(urllib.request.urlopen(url).read(), "html.parser")
+    
+    output = bs.select('p.txt_box')
+    
+    return [node.text for node in output]
+```
+
+리턴값을 리스트 형태로 반환한다.
