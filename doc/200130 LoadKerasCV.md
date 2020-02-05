@@ -568,3 +568,125 @@ plt.imshow(img)
 print(img)
 ```
 
+모자이크 형태로(grid) 이미지가 저장되어 있다.
+
+```python
+img = (img*255).astype(dtype='uint8')
+
+blob = cv2.dnn.blobFromImage(img, 1/255) #  학습할때 256으로 나누었음.
+print(blob.shape)
+print(blob.dtype)
+
+#why ? 보통 1,32,32,3으로 넘겨야함
+```
+
+```python
+#
+net.setInput(blob)
+out = net.forward()
+print(out)
+```
+
+오류남.나중에 확인 필요
+
+### freeze layers
+
+```python
+def freeze_graph(model_dir, output_node_names):
+  """Extract the sub graph defined by the output nodes and convert 
+  all its variables into constant 
+  Args:
+      model_dir: the root folder containing the checkpoint state file
+      output_node_names: a string, containing all the output node's names, 
+                          comma separated
+                        """
+  if not tf.gfile.Exists(model_dir):
+    raise AssertionError(
+      "Export directory doesn't exists. Please specify an export "
+      "directory: %s" % model_dir)
+
+  if not output_node_names:
+    print("You need to supply the name of a node to --output_node_names.")
+    return -1
+
+  # We retrieve our checkpoint fullpath
+  checkpoint = tf.train.get_checkpoint_state(model_dir)
+  input_checkpoint = checkpoint.model_checkpoint_path
+    
+  # We precise the file fullname of our freezed graph
+  absolute_model_dir = "/".join(input_checkpoint.split('/')[:-1])
+  output_graph = absolute_model_dir + "/frozen_model.pb"
+  print(output_graph)
+
+  # We clear devices to allow TensorFlow to control on which device it will load operations
+  clear_devices = True
+
+  # We start a session using a temporary fresh Graph
+  with tf.Session(graph=tf.Graph()) as sess:
+    # We import the meta graph in the current default Graph
+    saver = tf.train.import_meta_graph(input_checkpoint + '.meta', clear_devices=clear_devices)
+
+    # We restore the weights
+    saver.restore(sess, input_checkpoint)
+
+    # We use a built-in TF helper to export variables to constants
+    output_graph_def = tf.graph_util.convert_variables_to_constants(
+      sess, # The session is used to retrieve the weights
+      tf.get_default_graph().as_graph_def(), # The graph_def is used to retrieve the nodes 
+      output_node_names.split(",") # The output node names are used to select the usefull nodes
+    ) 
+
+    # Finally we serialize and dump the output graph to the filesystem
+    with tf.gfile.GFile(output_graph, "wb") as f:
+      f.write(output_graph_def.SerializeToString())
+    print("%d ops in the final graph." % len(output_graph_def.node))
+
+  return output_graph_def
+```
+
+```python
+estimator_model = tf.keras.estimator.model_to_estimator(keras_model = model, model_dir = './k')
+#k 폴더에 keras폴더에 chekc point 파일 저장함
+# out이름 어떻게 알지?
+freeze_graph('./k/keras/',"activation_3/Sigmoid")
+
+#./k/keras/frozen_model.pb에 생성
+
+""
+```
+
+```python
+model.summary()
+#result
+Model: "sequential_7"
+_________________________________________________________________
+Layer (type)                 Output Shape              Param #   
+=================================================================
+dense (Dense)                (None, 64)                192       
+_________________________________________________________________
+dense_1 (Dense)              (None, 64)                4160      
+_________________________________________________________________
+dense_2 (Dense)              (None, 64)                4160      
+_________________________________________________________________
+dense_3 (Dense)              (None, 64)                4160      
+_________________________________________________________________
+batch_normalization_3 (Batch (None, 64)                256       
+_________________________________________________________________
+activation_2 (Activation)    (None, 64)                0         
+_________________________________________________________________
+dense_4 (Dense)              (None, 1)                 65        
+_________________________________________________________________
+activation_3 (Activation)    (None, 1)                 0         
+=================================================================
+Total params: 12,993
+Trainable params: 12,865
+Non-trainable params: 128
+_________________________________________________________________
+```
+
+```python
+model.layers[7].name
+#'activation_3'
+
+```
+
