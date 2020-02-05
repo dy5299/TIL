@@ -886,7 +886,7 @@ localhost는 127.0.0.1 로 정의되어 있다. (내부 DNS)	= 0.0.0.0
 
 - route 주소와 함수 이름은 관련 없다. 그러나 통상적으로 같은 이름을 사용한다.
 
-#### GET parameter
+### GET parameter
 
 get parameter는 request.args.get() 함수로 호출 가능하다.
 
@@ -894,8 +894,56 @@ get parameter는 request.args.get() 함수로 호출 가능하다.
 http://localhost:3000/?name=abc&item=%ED%95%9C%EA%B8%80
 ```
 
- 
+ ### JSON file format
 
 decorator 밑의 definition은 기본적으로 HTML 형식으로 전달된다.
 
 그런데 구글의 dialogflow와 통신하려면 json 형태로 전달해야 한다.
+
+`json.dumps(문자열)` : JSON file format으로 변환한다.
+
+`jsonify(문자열)` : flask에서 제공하는 함수로 JSON file format으로 변환한다.
+
+```python
+@app.route('/weather')
+def weather():
+    city = request.args.get("city")
+    info = getWeather(city)
+    return "<font color=red>" + info["temp"] + "도 / " + info["desc"] + "</font>"
+    #기본적으로 HTML 형식으로 전달된다.
+```
+
+```python
+@app.route('/weather')
+def weather():
+    city = request.args.get("city")
+    info = getWeather(city)
+    #return json.dumps(info)
+    #json.dumps(source) : JSON 형식으로 변환한다.
+    #혹은 flask에서 제공하는 함수로
+    return jsonify(info)
+```
+
+### dialogflow 규약에 맞게 data return
+
+```python
+@app.route('/dialogflow', methods=['POST'])
+```
+
+POST 방식에서는 url browser에서는 Method Not Allowed - The method is not allowed for the requested URL.
+
+디버깅 시 `['POST', 'GET']` 로 두 방식 모두 동작하도록 하면 디버깅하기 편리하다.
+
+Secure Tunnels(NGROK)
+
+### Secure Tunnels
+
+ngrok : 공인 IP가 아니여도 외부에서 접속 가능하게 하는 터널 프로그램이다.
+
+DOS에서 ngrok.exe 파일이 있는 폴더에서 다음 명령어를 실행하면 된다.
+
+```bash
+ngrok http 3000
+```
+
+dialog(외부) ---(port 80)--- tunnel ---(port 3000)--- my PC
