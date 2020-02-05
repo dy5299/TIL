@@ -745,9 +745,9 @@ HTML(
 )
 ```
 
-# google dialogflow에 적용하기
+## WEB server - Flask
 
-## Web Frameworks 비교
+### Web Frameworks 비교
 
 출처: https://sixfeetup.com/blog/4-python-web-frameworks-compared
 
@@ -827,13 +827,12 @@ ORM, 폼 검증 및 업로드 처리 등을 위한 확장 기능을 이용할 �
 
 플래스크와 같이 사용하면 좋은 모듈 구성:
 
-- 
 - Flask + Jinja2 + SQLAlchemy
 - Flask + Mako + SLQLAlchemy
 - Flask + Jinja2 + Peewee
 - Flask + CouchDB
 
-## Flask
+### Flask
 
 Flask는 하나의 독립적인 서버로 실행되어야하기 때문에 주피터에서 실행되지 않는다.
 
@@ -852,21 +851,51 @@ python 파일명.py
 파일 수정 시 flask server를 restart해야 한다. 그런데 debug obtion 주면 파일 변경을 감지하여 업데이트한다.
 
 ```python
-from flask import Flask
+from flask import Flask, request
 
 app = Flask(__name__)
 
 @app.route('/')         #데이터를 네트웍 통해서 나를 호출한 곳으로 다시 보냄.
+#decorator: 함수 호출 시 함수 앞뒤로 코드 삽입된다.
 def home():
-    return "hellosss^^"
+    name = request.args.get("name")     #각 변수명은 상관없지만 통상적으로 일치시킨다.
+    item = request.args.get("item")
+    return "hellosss^^-----" + name + item
+
+@app.route('/abc')
+def home2():
+    return "abcabc^^"
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=3000, debug=True)
+    app.run(host='0.0.0.0', port=3000, debug=True)      #debug option
+
+@app.route('/s5/<name>')
+def s6(name):
+    return "data=" + name
 ```
 
-공인 ip가 있어야 외부와 통신 가능하다.
+- 공인 ip가 있어야 외부와 통신 가능하다.
 
 공인IP ~ LAN ~ 
 
 localhost는 127.0.0.1 로 정의되어 있다. (내부 DNS)	= 0.0.0.0
 
+- `@` decorator : 함수 호출 시 함수의 앞뒤로 코드가 삽입되어 코딩을 간소화해준다.
+
+- Not Found: route 주소가 없으니 매핑되는 함수가 없다고 **서버**에서 보내는 메세지이다.
+
+- route 주소와 함수 이름은 관련 없다. 그러나 통상적으로 같은 이름을 사용한다.
+
+#### GET parameter
+
+get parameter는 request.args.get() 함수로 호출 가능하다.
+
+```bash
+http://localhost:3000/?name=abc&item=%ED%95%9C%EA%B8%80
+```
+
+ 
+
+decorator 밑의 definition은 기본적으로 HTML 형식으로 전달된다.
+
+그런데 구글의 dialogflow와 통신하려면 json 형태로 전달해야 한다.
