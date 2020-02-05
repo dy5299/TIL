@@ -72,9 +72,15 @@ Fallback intent 는 말 그대로 사용자의 대화가 어떤 intent 와도 �
 
 ‘내일 오후 2시 되나요’ 에서 무엇을 위한 ‘내일 오후 2시’ 인가를 파악하기 위해서 전체 대화의 문맥을 사람이 이해하는 것처럼, 그 전에 대화가 되었던 ‘수리’ 라는 것을 기억하는 것을 의미합니다.
 
-### fullfillment
+### fulfillment
 
 명시한 서버를 거쳐와서 답변하는 방식이다.
+
+dialogflow agent가 의도에 따라 business logic을 호출
+
+<img src="images/200205_fulfillment.png" alt="200205_fulfillment" style="zoom: 67%;" />
+
+웹 방식이 가장 쉽다.
 
 ### integrations
 
@@ -126,7 +132,7 @@ parameter 의 IS LIST 속성을 ON시키면 다음과 같은 복합 entities, �
 
 ### python 연동 - openAPI
 
-python 연동에는 두 가지 방법 있다. openAPI 이용하여 갖다 쓰는 방법과, fullfillment 통해서 - 필요한 logic만 집어넣는 방식
+python 연동에는 두 가지 방법 있다. openAPI 이용하여 갖다 쓰는 방법과, fulfillment 통해서 - 필요한 logic만 집어넣는 방식
 
 get 방식은 보안 문제가 있다. 주소에 query string 담겨있다. 브라우저에서 호출할 수 있다.
 
@@ -437,13 +443,15 @@ GET 방식은 전송 URL이 노출되어 보안에 취약하고 길이 제한이
 
 POST 방식은 길이 제한이 없다.
 
-## in Python
+### in Python,
 
 - 파이썬 표준 패키지(beautifulsoup)를 이용
 
 - 한글이 url 코드로 인코딩 해야한다.
 
 https://search.naver.com/search.naver?query=%EB%B6%80%EC%82%B0%EA%B4%91%EC%97%AD%EC%8B%9C+%EB%82%A0%EC%94%A8
+
+## 날씨, 음식주문
 
 ### HTML Parsing
 
@@ -615,7 +623,7 @@ Bot:도시를 알려주세요
 2020-02-06의 제주시 날씨정보 : 3 ℃ / 흐림, 어제보다 4˚ 낮아요
 ```
 
-### 지식백과 결과
+## 지식백과 결과
 
 ```python
 def getQuery(word) :
@@ -630,3 +638,235 @@ def getQuery(word) :
 ```
 
 리턴값을 리스트 형태로 반환한다.
+
+```python
+#최종
+while True :
+    txt = input("->")
+    dict = get_answer(txt, 'user01')
+    answer = dict['result']['fulfillment']['speech']
+    intentName = dict['result']['metadata']['intentName']
+    
+    if intentName == 'query' :
+        #any는 파이썬 내장변수라서 어쩔 수 없이 다른 변수명을 사용해야 한다.
+        word = dict["result"]['parameters']['any']
+        print(getQuery(word)[0])
+    
+    elif intentName == 'orderfood2' :
+        price = {"짜장면":5000, "짬뽕":10000,"탕수육":20000}
+        params = dict['result']['parameters']['food_number']
+    
+        output = [  food.get("number-integer", 1)*price[food["food"]] for food in params  ]
+        print(sum(output))
+        
+    elif intentName == 'weather' and dict['result']['actionIncomplete'] == False :
+        date = dict['result']['parameters']['date']
+        geo_city= dict['result']['parameters']['geo-city']
+        
+        info = getWeather(geo_city)
+        
+        print(f"{date}의 {geo_city} 날씨정보 : {info['temp']} ℃ / {info['desc']}")
+        
+    else :
+        print("Bot:" + answer)
+```
+
+## TTS
+
+TTS(text to speech)
+
+install gtts module
+
+```python
+from gtts import gTTS
+import IPython.display as ipd
+
+text = "갑자기 분위기가 싸해진다.', '갑자기 분위기가 싸해지는데"
+tts = gTTS(text=text, lang='ko')
+tts.save("output_tts.mp3")
+ipd.Audio('output_tts.mp3', autoplay=True,)		
+```
+
+`tts.save` : save to file
+
+`ipd.display(ipd.Audio('output_tts.mp3', autoplay=True,))` : 주피터 노트북에 보이게 하기
+
+```python
+#위 최종코드에서 음성변환만 추가
+while True :
+    txt = input("->")
+    dict = get_answer(txt, 'user01')
+    answer = dict['result']['fulfillment']['speech']
+    intentName = dict['result']['metadata']['intentName']
+    
+    if intentName == 'query' :
+        word = dict["result"]['parameters']['any']
+        
+        text = getQuery(word)[0]
+        tts = gTTS(text=text, lang='ko')
+        tts.save("output_tts.mp3")
+        #ipd.Audio('output_tts.mp3', autoplay=True,)
+        ipd.display(ipd.Audio('output_tts.mp3', autoplay=True,))  #주피터노트북에보이기
+        print(text)
+    
+    elif intentName == 'orderfood2' :
+        price = {"짜장면":5000, "짬뽕":10000,"탕수육":20000}
+        params = dict['result']['parameters']['food_number']
+    
+        output = [  food.get("number-integer", 1)*price[food["food"]] for food in params  ]
+        print(sum(output))
+        
+    elif intentName == 'weather' and dict['result']['actionIncomplete'] == False :
+        date = dict['result']['parameters']['date']
+        geo_city= dict['result']['parameters']['geo-city']
+        
+        info = getWeather(geo_city)
+        
+        print(f"{date}의 {geo_city} 날씨정보 : {info['temp']} ℃ / {info['desc']}")
+        
+    else :
+        print("Bot:" + answer)
+```
+
+### HTML
+
+```python
+from IPython.core.display import HTML
+
+HTML(
+"""
+<iframe
+    allow="microphone;"
+    width="250"
+    height="330"
+    src="https://console.dialogflow.com/api-client/demo/embedded/rabbit5">
+</iframe>
+"""
+)
+```
+
+# google dialogflow에 적용하기
+
+## Web Frameworks 비교
+
+출처: https://sixfeetup.com/blog/4-python-web-frameworks-compared
+
+Pyramid - 유연성
+
+피라미드는 Pylons 1.0과 repoze.bfg 를 병합하면서 탄생하였습니다. 
+
+"배터리 포함" 이라는 파이썬 사상에 어긋나지는 않지만 사이트 바로 적용할 수 있는
+
+컴포넌트를 바로 의미하지는 않습니다.
+
+피라미드 커뮤너티는 빠르게 성장하고 있습니다. 문서는 아주 잘 정리되어 있어서
+
+별도의 커뮤너티의 도움이 없이도 작업할 수 있을 정도입니다. 
+
+피라미드는 최소화, 속도, 신뢰성을 지향합니다. 
+
+Python3을 지원하는 최초의 웹 프레임워크 중의 하나입니다.
+
+장점:
+
+- 빨리 시작할 수 있습니다
+- API 프로젝트에 작업 가능합니다
+- 생각을 프로토타이핑 하는데 용이합니다
+- CMS 혹은 KMS와 같은 대용량 웹 앱도 만들어지고 있습니다
+
+Bottle - 간결함
+
+바틀은 라우팅, 템플릿과 WSGI를 통한 약간의 추상화를 하는 박스를 만들면서
+
+탄생한 마이크로 프레임워크입니다. Python3에 구동 가능합니다.
+
+장점:
+
+- 융통성을 찾는 개발자에게 유리합니다
+- 웹 API를 생성할 수 있습니다
+- 무언가 정말로 간단한 웹을 위한 사람을 위한 것입니다
+
+Django - 강렬함
+
+쟁고는 아마도 파이썬 기반의 가장 큰 웹 프레임워크입니다. 크고 활발한 커뮤너티를 가지고 있습니다.
+
+또한 많은 기능을 포함할 뿐만 아니라 관리자 인터페이스도 가지고 있습니다.
+
+모델 기반의 폼을 가지고 있고 템플릿 언어를 포함하며 개발자 문서도 잘 되어 있습니다.
+
+쟁고를 이용하면 좋은 사람:
+
+- 온라인 포럼 등을 통하여 서로의 생각을 공유하는 것을 종아하는 개발자
+- 강력한 내장 툴을 이용하여 빠르게 무언가를 만들려고 하는 개발자
+
+유용한 쟁고 앱:
+
+- South (스키마 및 데이터 전환)
+- Celery (역주: 샐러리 분산 API 프레임워크)
+- Rest 프레임워크 또는 TastyPie
+- Django Extensions
+
+Flask - 민첩함
+
+플래스크는 하나의 파일로 구성된 소스가 웹 프레임워크가 될 수 있다는 만우절의 농담과도 같은
+
+마이크로 프레임워크로 탄생하였습니다. 간결하고 작은 것을 지향합니다.
+
+전체 프레임워크는 몇 개의 모듈로 구성되어 있습니다. 처음 시작을 위한 뼈대는 없는 대신,
+
+빈 페이지에서 시작할 수 있습니다. 플래스크가 자체로 많은 기능을 제공하지 않는더라도
+
+ORM, 폼 검증 및 업로드 처리 등을 위한 확장 기능을 이용할 수 있습니다.
+
+장점:
+
+- 프로그래밍 교육
+- "맛보기" 코딩을 하려는 개발자
+- 빠르게 프로토타입을 구성해 보려는 개발자
+- 단일 구성의 앱을 만들려는 개발자
+
+플래스크와 같이 사용하면 좋은 모듈 구성:
+
+- 
+- Flask + Jinja2 + SQLAlchemy
+- Flask + Mako + SLQLAlchemy
+- Flask + Jinja2 + Peewee
+- Flask + CouchDB
+
+## Flask
+
+Flask는 하나의 독립적인 서버로 실행되어야하기 때문에 주피터에서 실행되지 않는다.
+
+웹통신을 하기 위한 기능이 들어있어, 브라우저 요청에 반응할 수 있다.
+
+서버실행: anaconda prompt에서
+
+```bash
+python 파일명.py
+```
+
+자체가 웹서버를 담당(middleware?)해서 별도의 서버가 필요하지 않다.
+
+간단해서 IoT 등에서 사용된다.
+
+파일 수정 시 flask server를 restart해야 한다. 그런데 debug obtion 주면 파일 변경을 감지하여 업데이트한다.
+
+```python
+from flask import Flask
+
+app = Flask(__name__)
+
+@app.route('/')         #데이터를 네트웍 통해서 나를 호출한 곳으로 다시 보냄.
+def home():
+    return "hellosss^^"
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=3000, debug=True)
+```
+
+공인 ip가 있어야 외부와 통신 가능하다.
+
+공인IP ~ LAN ~ 
+
+localhost는 127.0.0.1 로 정의되어 있다. (내부 DNS)	= 0.0.0.0
+
