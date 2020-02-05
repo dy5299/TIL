@@ -34,6 +34,8 @@ Cascade Decision Process : simple binary classifier. 고속으로 분류
 
 ## 1. haar-like
 
+### face detection
+
 ```python
 import cv2, numpy as np
 import math
@@ -114,7 +116,9 @@ imshow('src', src)
 
 classifier 리턴값은 좌표이다. (x, y, width, height)
 
+정면 얼굴은 잘 검출하는데, 회전된 얼굴은 검출 못 한다.
 
+### eye detection
 
 eye classifier는 고주파 성분이 너무 없어서, 눈이 아닌데 눈으로 검출하는 경우가 많다.
 
@@ -192,6 +196,36 @@ SVM: 분류할 수 있는 최전선 벡터: support vector: 전체의 10-15%. �
 
 -> HOG 기본 라이브러리에 내장시킴
 
+### 동영상에 적용
+
+```python
+cap = cv2.VideoCapture('img/vtest.avi')
+#동영상은 한 번만 읽는 것임
+
+create_win([frame], scale=0.7)
+
+#frame read
+for i in range(300) :
+    ret, frame = cap.read()  #이 라인 호출할 때마다 프레임 하나씩 읽는다.
+    
+    #(프레임이 존재하는지 안하는지 bull,
+    if i == 0 : 
+        create_win([frame], 0.5)
+    if not ret:
+        break
+    
+    detected, _ = hog.detectMultiScale(frame)
+    
+    for (x, y, w, h) in detected:
+        c = (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
+        cv2.rectangle(frame, (x, y), (x + w, y + h), c, 3)
+        
+    update_win([frame])
+#imshow('out', frame) #300번째 frame image
+```
+
+한계점: scale, rotation
+
 ## 3. ORB
 
 Oriented FASTand Rotated BRIEF
@@ -214,7 +248,47 @@ local descriptor
 
 scaling, rotation 덜 민감하게 다 찾아냄.
 
-샘플 중 가장 비슷한 이미지 찾기 가능 -> 위치 찾기도 가능하다는 의미.
+
+
+```python
+import cv2, numpy as np
+import math
+import time
+import random
+from matplotlib import pyplot as plt
+%matplotlib inline
+
+
+def imshow(tit, image) :
+    plt.title(tit)    
+    if len(image.shape) == 3 :
+        plt.imshow(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
+    else :
+        plt.imshow(image, cmap="gray")
+    plt.show()
+    
+
+
+
+orb = cv2.ORB_create()
+
+matcher = cv2.BFMatcher_create(cv2.NORM_HAMMING)
+
+
+images = ['img/book1.jpg', 'img/book2.jpg', 'img/book3_.jpg', 'img/book4.jpg', ] 
+
+database_kp = []
+database_desc = []
+for name in images :
+    img = cv2.imread(name, cv2.IMREAD_GRAYSCALE)
+    keypoints, desc = orb.detectAndCompute(img, None)
+    database_kp.append(keypoints)
+    database_desc.append(desc)
+```
+
+### 샘플 중 가장 비슷한 이미지 찾기
+
+샘플 중 가장 비슷한 이미지 찾기 가능하다는 것은 위치 찾기도 가능하다는 의미이다.
 
 ```python
 test = cv2.imread("img/book1test.jpg", cv2.IMREAD_GRAYSCALE)
