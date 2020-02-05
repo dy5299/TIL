@@ -1,4 +1,4 @@
-from flask import Flask, request
+from flask import Flask, request, jsonify
 import urllib, requests, json
 from bs4 import BeautifulSoup
 
@@ -27,8 +27,18 @@ def home():
 def weather():
     city = request.args.get("city")
     info = getWeather(city)
-    return "<font color=red>" + info["temp"] + "도 / " + info["desc"] + "</font>"
+    #return "<font color=red>" + info["temp"] + "도 / " + info["desc"] + "</font>"
     #기본적으로 HTML 형식으로 전달된다.
+    #return json.dumps(info)
+    #json.dumps(source) : JSON 형식으로 변환한다.
+    return jsonify(info)
+
+
+
+@app.route('/dialogflow', methods=['GET'])   #두 방식 모두 동작한다. GET 방식을 추가하면 Debugging할 때 편리하다.
+def dialogflow():
+    res = {'fulfillmentText':'Hello~~~'}    #dialogflow 규칙 - 문장 출력
+    return jsonify(res)
 
 
 @app.route('/abc')
