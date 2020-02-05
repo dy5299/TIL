@@ -20,7 +20,7 @@ app = Flask(__name__)
 def home():
     name = request.args.get("name")     #각 변수명은 상관없지만 통상적으로 일치시킨다.
     item = request.args.get("item")
-    return "hellosss^^-----" + name + item
+    return "hellosss~~~~~~" + name + item
 
 
 @app.route('/weather')
@@ -35,7 +35,7 @@ def weather():
 
 
 
-@app.route('/dialogflow', methods=['GET'])   #두 방식 모두 동작한다. GET 방식을 추가하면 Debugging할 때 편리하다.
+@app.route('/dialogflow', methods=['GET', 'POST'])   #두 방식 모두 동작한다. GET 방식을 추가하면 Debugging할 때 편리하다.
 def dialogflow():
     res = {'fulfillmentText':'Hello~~~'}    #dialogflow 규칙 - 문장 출력
     return jsonify(res)
