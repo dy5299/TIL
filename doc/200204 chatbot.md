@@ -435,9 +435,9 @@ def fibo(a1,a2,n) :
 print(fibo(1,1,40))
 ```
 
-# 웹 정보 이용
+# WEB - HTTP Method
 
-## WEB - HTTP Method (GET/POST)
+## GET/POST
 
 웹서버에 클라이언트의 data를 전송하기 위한 전송방법에는 GET 과 POST가 있다.
 
@@ -447,7 +447,7 @@ GET 방식은 전송 URL이 노출되어 보안에 취약하고 길이 제한이
 
 POST 방식은 길이 제한이 없다.
 
-### in Python,
+## in Python,
 
 - 파이썬 표준 패키지(beautifulsoup)를 이용
 
@@ -749,9 +749,9 @@ HTML(
 )
 ```
 
-## WEB server
+# WEB server
 
-### Web Frameworks 비교
+## Web Frameworks 비교
 
 출처: https://sixfeetup.com/blog/4-python-web-frameworks-compared
 
@@ -836,7 +836,7 @@ ORM, 폼 검증 및 업로드 처리 등을 위한 확장 기능을 이용할 �
 - Flask + Jinja2 + Peewee
 - Flask + CouchDB
 
-### Flask
+## Flask
 
 Flask는 하나의 독립적인 서버로 실행되어야하기 때문에 주피터에서 실행되지 않는다.
 
@@ -892,15 +892,11 @@ localhost는 127.0.0.1 로 정의되어 있다. (내부 DNS)	= 0.0.0.0
 
 - route 주소와 함수 이름은 관련 없다. 그러나 통상적으로 같은 이름을 사용한다.
 
-### GET parameter
-
-get parameter는 request.args.get() 함수로 호출 가능하다.
-
 ```bash
 http://localhost:3000/?name=abc&item=%ED%95%9C%EA%B8%80
 ```
 
- ### JSON file format
+ ## JSON file format
 
 decorator 밑의 definition은 기본적으로 HTML 형식으로 전달된다.
 
@@ -930,7 +926,7 @@ def weather():
     return jsonify(info)
 ```
 
-### dialogflow 규약에 맞게 data return
+## dialogflow 규약에 맞게 data return
 
 ```python
 @app.route('/dialogflow', methods=['POST'])
@@ -956,7 +952,7 @@ dialog(외부) ---(port 80)--- tunnel ---(port 3000)--- my PC
 
 (200206)
 
-### WEB server
+# WEB server
 
 파일명은 상관없지만 통상적으로 index.html
 
@@ -970,7 +966,7 @@ python -m http.server 80
 
 대다수 기능은 웹 브라우저가 담당하는 것이다.
 
-#### 브라우저에 파일을 요청하면...
+## 브라우저에 파일을 요청하면...
 
 pptx, zip 등은 다운된다. 기본적으로 이미지든 mp3든 어딘가에 다운로드 받은 뒤 브라우저가 해당 파일을 출력/재생해주는 것이다.
 
@@ -1008,7 +1004,7 @@ apache는 reloading 안 하고, 다른 서버는 매번 요청할 때마다 데�
 
 임의의 폴더에서 파일명 없이 디렉토리만 있는 주소로 요청할 경우, 브라우저가 index.html 을 요청하도록 기본 설정되어있다.
 
-#### Web Server Application
+## Web Server Application
 
 웹을 기반으로 서버실행되는 프로그램으로 동적 HTML을 리턴하며 기존 서버 자원을 사용한다.
 
@@ -1035,7 +1031,32 @@ def home():
     return html    #동적 html 생성한 것임
 ```
 
-##### practice
+### practice
 
 방문자수를 이미지로 출력하는 web application
+
+How?
+
+이미지를 동적으로 만들어야 하나?
+
+-> 숫자 0~9가 각각 저장된 이미지 파일을 이용
+
+html code와 python code를 섞어써야 한다는 것이 불편하다.
+
+## parameter 받기
+
+### GET 방식으로
+
+get parameter는 request.args.get() 함수로 호출 가능하다.
+
+```python
+@app.route('/weather')
+def weather():
+    city = request.args.get('city')
+    return f"{city} 날씨 좋아요"
+```
+
+브라우저에서 호출 시 `http://127.0.0.1:3000/weather?city=부산`
+
+### form 으로
 
