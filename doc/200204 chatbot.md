@@ -1191,3 +1191,9 @@ console base 전용 application 만들면, 로그인 한 user id로 주면 되�
 
 다행히 dialogflow는 session id를 제공한다.
 
+
+
+session key 사용하면 되겠다.
+
+그런데 필요한 값(저장해야 할 값)이 두 개 이상이다. -> 객체 사용
+
