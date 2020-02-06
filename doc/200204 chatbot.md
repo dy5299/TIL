@@ -82,6 +82,10 @@ dialogflow agent가 의도에 따라 business logic을 호출
 
 웹 방식이 가장 쉽다.
 
+INTENT(주황색)과 그 오른쪽(CODE) 통신 간 터널을 NGROK이 연결해준다.
+
+모든 응답을 서버를 통할 필요는 없으므로 INTENT까지 가서 NGROK으로 갈지, ACTIONABLE DATA로 갈지의 판단을 조건문으로 설정해야 한다.
+
 ### integrations
 
 다양한 플랫폼과 연동하는 기능이다.
@@ -745,7 +749,7 @@ HTML(
 )
 ```
 
-## WEB server - Flask
+## WEB server
 
 ### Web Frameworks 비교
 
@@ -837,6 +841,8 @@ ORM, 폼 검증 및 업로드 처리 등을 위한 확장 기능을 이용할 �
 Flask는 하나의 독립적인 서버로 실행되어야하기 때문에 주피터에서 실행되지 않는다.
 
 웹통신을 하기 위한 기능이 들어있어, 브라우저 요청에 반응할 수 있다.
+
+파이썬에서는 경량 WEB SERVER를 위해 세 가지 방법을 제공한다.
 
 서버실행: anaconda prompt에서
 
@@ -934,11 +940,9 @@ POST 방식에서는 url browser에서는 Method Not Allowed - The method is not
 
 디버깅 시 `['POST', 'GET']` 로 두 방식 모두 동작하도록 하면 디버깅하기 편리하다.
 
-Secure Tunnels(NGROK)
-
 ### Secure Tunnels
 
-ngrok : 공인 IP가 아니여도 외부에서 접속 가능하게 하는 터널 프로그램이다.
+NGROK : 공인 IP가 아니여도 외부에서 접속 가능하게 하는 터널 프로그램이다.
 
 DOS에서 ngrok.exe 파일이 있는 폴더에서 다음 명령어를 실행하면 된다.
 
@@ -947,3 +951,91 @@ ngrok http 3000
 ```
 
 dialog(외부) ---(port 80)--- tunnel ---(port 3000)--- my PC
+
+
+
+(200206)
+
+### WEB server
+
+파일명은 상관없지만 통상적으로 index.html
+
+```bash
+python -m http.server 80
+```
+
+웹 서버는 웹 클라이언트가 요청하는 서비스만 결과를 HTML로 제공해주고 서버를 끊는다.
+
+(서버가 계속 연결되면 다른 사람이 접속을 못하므로)
+
+대다수 기능은 웹 브라우저가 담당하는 것이다.
+
+#### 브라우저에 파일을 요청하면...
+
+pptx, zip 등은 다운된다. 기본적으로 이미지든 mp3든 어딘가에 다운로드 받은 뒤 브라우저가 해당 파일을 출력/재생해주는 것이다.
+
+물론 중간중간 보여주는 streaming 방식도 적용되고 있다.
+
+`/` : 물리적인 경로 의미 (flask는 가상폴더 개념이지만)
+
+=> [정리] http : download server이다. 완료 후에 연결을 끊는다.
+
+```html
+<h1>Hello</h1>
+<img src=yellow.jpg>
+<img src=yellow.jpg>
+<img src=yellow.jpg>
+```
+
+html에 img 파일이 태그되어있는 구조에서, 웹서버에 요청을 두 번 한 것이다. html 파일을 브라우저가 요청 -> 웹서버가 html 다운로드 -> 브라우저가 html 해석 코드 실행 -> (인터넷 접속 끊어짐) -> 브라우저가 html 실행하는 중 img 로딩코드가 있으니 브라우저가 서버에 jpg 파일을 요청 -> 브라우저가 jpg 파일 다운 -> 브라우저가 jpeg 인코딩
+
+```html
+<h1>Hello</h1>
+<img src=yellow.jpg?444>
+<img src=yellow.jpg?555>
+<img src=yellow.jpg?666>
+```
+
+html에 같은 이미지 여러 개 태그된 구조에서,
+
+apache는 reloading 안 하고, 다른 서버는 매번 요청할 때마다 데이터를 서버에 요청할 수도 있다.
+
+(cache 기능이 적용되어 있으면) 이미지를 한번 다운받은 적이 있으면 local에 cahce로 남겨둬서 같은 이미지를 요청하면 서버를 안 들려
+
+네트워크 접속을 네 번 한다. parameter가 다르니 주소가 다르므로 cache 기능이 적용되지 않는다.
+
+
+
+임의의 폴더에서 파일명 없이 디렉토리만 있는 주소로 요청할 경우, 브라우저가 index.html 을 요청하도록 기본 설정되어있다.
+
+#### Web Server Application
+
+웹을 기반으로 서버실행되는 프로그램으로 동적 HTML을 리턴하며 기존 서버 자원을 사용한다.
+
+python server에서는 다른 데이터를 불러오려면 static folder 내부에서 요청하면 된다.
+
+한계는 html과 python 코드를 섞어쓰기가 힘들다.
+
+py 파일에서 다음처럼 하면 html code를 좀 더 쉽게 넣을 수 있다.
+
+```python
+@app.route('/')
+def home():
+    html = """
+    <h1>Hello</h1>
+    <img src=/static/yellow.jpg></img>
+    <br>
+    <iframe
+        allow="microphone;"
+        width="350"
+        height="330"
+        src="https://console.dialogflow.com/api-client/demo/embedded/rabbit5">
+    </iframe>
+    """
+    return html    #동적 html 생성한 것임
+```
+
+##### practice
+
+방문자수를 이미지로 출력하는 web application
+
