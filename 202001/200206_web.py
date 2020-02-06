@@ -62,13 +62,20 @@ def counter_pf_2():
 
 
 
-@app.route('/weather')
+@app.route('/weather', methods=['POST', 'GET'])
 def weather():
-    city = request.args.get('city')
+    """
+    if request.method == 'GET' :
+             #GET 방식만 접근 가능한 함수
+    else:
+        req =       #POST 방식만 접근 가능한 함수. 값이 없으면 오류나서 default value 지정하는 것이 일반적.
+    """
+    #위를 삼항 연산자를 python의 if else로 표현하면
+    #C or java에서는 삼항연산자를 지원해서,
+    #req = request.method == "GET" ? request.args : request.form
+    req = request.args if request.method == 'GET' else request.form
+    city = req.get("city")
     return f"{city} 날씨 좋아요"
-
-
-
 
 
 

@@ -952,7 +952,7 @@ dialog(외부) ---(port 80)--- tunnel ---(port 3000)--- my PC
 
 (200206)
 
-# WEB server
+# WEB
 
 파일명은 상관없지만 통상적으로 index.html
 
@@ -1033,6 +1033,8 @@ def home():
 
 ### practice
 
+동적으로 HTML을 만들어내보자.
+
 방문자수를 이미지로 출력하는 web application
 
 How?
@@ -1043,20 +1045,149 @@ How?
 
 html code와 python code를 섞어써야 한다는 것이 불편하다.
 
+```python
+#list 방법으로 반복
+@app.route('/counter_pf_1')
+def counter_pf_1():
+    global cnt
+    cnt += 1
+
+    html = "".join(  [  f"<img src=/static/{i}.png width=32>" for i in str(cnt)  ]  )
+    html += "명이 방문했습니다."
+    return html
+
+#for 방법으로 반복
+@app.route('/counter_pf_2')
+def counter_pf_2():
+    global cnt
+    cnt += 1
+    
+    html=""
+    for i in str(cnt) :
+        html += f"<img src=/static/{i}.png width=32>"
+    html += "명이 방문했습니다."
+    return html
+```
+
 ## parameter 받기
 
 ### GET 방식으로
 
-get parameter는 request.args.get() 함수로 호출 가능하다.
+GET parameter는 `request.args.get()` 함수로 호출 가능하다.
+
+POST parameter는 `request.form.get()` 함수로 호출 가능하다.
 
 ```python
-@app.route('/weather')
+@app.route('/weather', methods=['POST', 'GET'])
 def weather():
-    city = request.args.get('city')
+    if request.method == 'GET' :
+        city = request.args.get('city')    #GET 방식만 접근 가능한 함수
+    else:
+        city = request.form.get('city', "인천")     #POST 방식만 접근 가능한 함수.
     return f"{city} 날씨 좋아요"
 ```
 
-브라우저에서 호출 시 `http://127.0.0.1:3000/weather?city=부산`
+(GET method) 브라우저에서 호출 시 `http://127.0.0.1:3000/weather?city=부산`
+
+POST method는 form을 사용해야 한다. 단, 값이 없으면 오류나서 default value 지정하는 것이 일반적이다.
 
 ### form 으로
+
+```html
+<form action=/weather method=post>
+    <input type=text name=city>         <!--name=불러올 변수명-->
+    <input type=submit value="날씨확인">
+</form>
+```
+
+line 1: submit 시 실행되는 action을 지정한다. Default method=GET
+
+## 특정 intent만 서버와 통신하기
+
+사전 수행해야 할 작업은 python server, ngrok 켠 뒤 ngrok url을 dialogflow에 설정한다.
+
+anaconda prompt 에서
+
+```bash
+python 파일명.py
+```
+
+ngrok.exe 실행해서
+
+```bash
+ngrok http 3000
+```
+
+server.py
+
+```python
+from flask import Flask, request, jsonify
+import urllib, requests, json
+from bs4 import BeautifulSoup
+
+def getWeather(city) :
+    url = 'https://search.naver.com/search.naver?query='
+    url = url + urllib.parse.quote_plus(city + " 날씨")
+    bs = BeautifulSoup(urllib.request.urlopen(url).read(), "html.parser")
+    temp = bs.select('span.todaytemp')
+    desc = bs.select('p.cast_txt')
+    return {"temp":temp[0].text, "desc":desc[0].text}
+
+def getQuery(word) :
+    url = 'https://search.naver.com/search.naver?where=kdic&query='
+    url = url + urllib.parse.quote_plus(word)
+    
+    bs = BeautifulSoup(urllib.request.urlopen(url).read(), "html.parser")
+    
+    output = bs.select('p.txt_box')
+    return [node.text for node in output]
+
+app = Flask(__name__)
+
+@app.route('/dialogflow', methods=['GET', 'POST'])
+def dialogflow():
+    req = request.get_json(force=True)      #강제로 받은 데이터를 JSON format으로 변환
+    print(json.dumps(req, indent=4))
+
+    answer = req['queryResult']['fulfillmentMessages']
+    intentName = req['queryResult']['intent']['displayName']
+    
+    if intentName == 'query' :
+        word = req["queryResult"]['parameters']['any']
+        text = getQuery(word)[0]
+        res = {'fulfillmentText':text}
+        
+    elif intentName == 'weather' :
+        date = req["queryResult"]['parameters']['date']
+        geo_city= req["queryResult"]['parameters']['geo-city']
+        
+        info = getWeather(geo_city)
+        text = f"{date}의 {geo_city} 날씨정보 : {info['temp']} ℃ / {info['desc']}"
+        res = {'fulfillmentText': text}
+        
+    else :
+        res = {'fulfillmentText':answer}
+    
+    return jsonify(res)
+
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=3000, debug=True)
+```
+
+unit test 진행 시에는 dialogflow 가 필요없으므로, json을 임의 데이터를 넣고 시행하면 된다.
+
+효율적인 코딩을 위해 unit test로 코드를 안정적으로 점검을 우선 하는 것을 추천한다.
+
+## session
+
+practice)
+
+가위바위보 해서 컴퓨터가 랜덤으로 -> 승/패 기록
+
+context를 user 별로 구분할 필요가 있다. => session 사용
+
+console base 전용 application 만들면, 로그인 한 user id로 주면 되는데, dialogflow는 그 과정을 개입하지 않는다.
+
+다행히 dialogflow는 session id를 제공한다.
 
