@@ -127,4 +127,4 @@ def s6(name):
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=3000, debug=True)      #debug option - 파일 변경 시 자동으로 reloading
-#위 코드 뒤에 있는 @app.route는 실행이 안 되네..l,
+#위 코드 뒤에 있는 @app.route는 실행이 안 되네..
