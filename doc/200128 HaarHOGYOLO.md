@@ -32,7 +32,7 @@ Cascade Decision Process : simple binary classifier. 고속으로 분류
 
 
 
-## 1. haar-like
+## 1. Haar-like
 
 ### face detection
 
@@ -159,9 +159,7 @@ imshow('src', src)
 
 Histogram of Oriented Gradients
 
-not weak classifier. SVM이라는 strong classifier 사용.
-
-haar-like와는 완전 반대방향.
+SVM이라는 strong classifier 사용한다. not weak classifier. Haar-like와는 완전 반대방향이다.
 
 
 
@@ -171,7 +169,7 @@ low-level vision: 각 지점에서의 gradient 구할 수 있다. Orientation ve
 
 방향성 벡터로 histogram.
 
-청므 만든 사람은 열적외선 카메라 영상으로 사람 감지하는 목적으로 만듦
+처음 만든 사람은 열적외선 카메라 영상으로 사람 감지하는 목적으로 만들었다.
 
 두 개의 벡터 구할 수 있다. orientation vector, magnitude vector
 
