@@ -148,7 +148,7 @@ print('accepting')
 data =client_socket.recv(65535) #클라이언트 접속이 되면 데이터를 읽어들임.
 #데이터는(패킷은) 최대 64k. 더 작을수도 클 수도 있는데, 크면 쪼개서 전송된다.
 
-print('receive : ' + data.decode())  #unicode to 한글
+print('receive >> ' + data.decode())  #unicode to 한글
 
 client_socket.send(data)
 print('send data')
@@ -170,7 +170,7 @@ sock.send('hello'.encode())
 print('send message')
 
 data=sock.recv(65535)
-print('receive : '+ data.decode())
+print('receive >> '+ data.decode())
 print('종료')
 ```
 
@@ -179,9 +179,112 @@ print('종료')
 - server.py 실행 후 client.py 실행하면
 
 ```python
-#result
+#result of server.py
 listening...
 accepting
-hello
+receive >> hello
+send data
+종료
+
+#result of client.py
+서버접속성공
+send message
+receive : hello
+종료
 ```
+
+
+
+주로 server 다룰 것.
+
+## simple http server
+
+- server.py
+
+```python
+#simple http server
+server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+server_socket.bind(('localhost', 80))
+server_socket.listen(0)
+print('listening...')
+client_socket, addr = server_socket.accept()
+print('accepting')
+data =client_socket.recv(65535)
+
+print('receive >> ' + data.decode())
+client_socket.close()
+```
+
+- 브라우저 요청 후 result
+
+```python
+#result of server.py
+listening...
+accepting
+receive : GET / HTTP/1.1	#http protocol version
+Host: localhost
+Connection: keep-alive
+Upgrade-Insecure-Requests: 1
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.87 Safari/537.36
+Sec-Fetch-Dest: document
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9
+Sec-Fetch-Site: none
+Sec-Fetch-Mode: navigate
+Sec-Fetch-User: ?1
+Accept-Encoding: gzip, deflate, br
+Accept-Language: ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7
+Cookie: _xsrf=2|941111c3|0f22749ff2b52f9ef56937eca9661be6|1580775110; username-localhost-8889="..."; username-localhost-8888="..."
+```
+
+```python
+#result of browser
+페이지가 작동하지 않습니다.localhost에서 전송한 데이터가 없습니다.
+ERR_EMPTY_RESPONSE
+```
+
+### GET/POST method
+
+- form.html
+
+```html
+<form action="http://127.0.0.1/" method=post>
+    <input type=text name=id>    <!--name 속성이 있는 데이터만 서버로 보내-->
+    <input type=submit value="send">
+</form>
+```
+
+- get method - header에 저장
+
+```bash
+listening...
+accepting
+receive >> GET /?id=hello HTTP/1.1
+```
+
+- post ,method - body에 저장
+
+```bash
+listening...
+accepting
+receive >> POST / HTTP/1.1
+...
+...
+...
+id=hello
+```
+
+### HTTP 통신
+
+```python
+client_socket.send('HTTP/1.0 200 0K\r\n\r\nHello'.encode('utf-8'))
+```
+
+HTTP 규약 : HTML 버전, 에러코드, OK, 엔터코드 2개
+
+send 함수 인풋은 무조건 byte data여야 한다.
+
+
+
+
 
