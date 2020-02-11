@@ -286,5 +286,142 @@ send 함수 인풋은 무조건 byte data여야 한다.
 
 
 
+buffer(임시메모리) : 어느정도 차면 그때 데이터를 보내. 굳이 그때그때 보내지 않아. (IOA 효율성 향상)
+
+```python
+#html file load
+server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+server_socket.bind(('localhost', 80))
+server_socket.listen(0)
+print('listening...')
+
+if True :           #while True : 테스트 할 때는 1회접속이 편리
+    client_socket, addr = server_socket.accept()
+    print('accepting')
+    data =client_socket.recv(65535)
+    data = data.decode()
+
+    headers = data.split("\r\n")
+    filename = headers[0].split(" ")[1]
+    
+    header = 'HTTP/1.0 200 0K\r\n\r\n'
+    file = open('.'+filename, 'rt', encoding='utf-8')
+    html = file.read()
+
+    client_socket.send((header+html).encode('utf-8'))
+    client_socket.close()    #HTTP의 특성. 접속하고 끊어버린다.
+```
 
 
+
+cf) 아래 두 줄을 `html = open('.'+filename, 'rt', encoding='utf-8').read()` 로 하면 안 되더라
+
+```python
+file = open('.'+filename, 'rt', encoding='utf-8')
+html = file.read()
+```
+
+
+
+- file 다루기
+
+```python
+filename = '/index.html'
+text = open('.'+filename, 'rt', encoding='utf-8').read()
+#2nd param: read, write, binary, textflie
+print(text)
+```
+
+`./filename` : current folder
+
+
+
+서버사이드 프로그램: 파이썬 텍스트를 서버에 전송, 서버에서 파이썬 코드를 실행, 결과를 가져와 리턴
+
+- 최종 test.py
+
+```python
+#확장자 나누기 + threading
+def httpprocess(client_socket) :
+    data =client_socket.recv(65535)
+    data = data.decode()
+    print(data)
+
+    try:    
+        headers = data.split("\r\n")
+        filename = headers[0].split(" ")[1]
+        _, ext = os.path.splitext(filename)
+
+        group_a = ['.html', '.htm']
+        group_b = ['.jpg', '.jpeg', '.png', '.bmp']
+
+        
+        if '.py' in filename:
+            html = subprocess.check_output(['python.exe', '.'+filename])
+            html = html.decode('cp949')
+            header = 'HTTP/1.0 200 0K\r\n\r\n'
+            client_socket.send((header+html).encode('utf-8'))
+        elif ext in group_a :
+            file = open('.'+filename, 'rt', encoding='utf-8')
+            html = file.read()
+            header = 'HTTP/1.0 200 0K\r\n\r\n'
+            client_socket.send((header+html).encode('utf-8'))
+        elif ext in group_b or ext == '.ico' :
+            client_socket.send('HTTP/1.1 200 OK\r\n'.encode())
+            client_socket.send("Content-Type: image/png\r\n".encode())
+            client_socket.send("Accept-Ranges: bytes\r\n\r\n".encode())
+            file = open('.' + filename, 'rb')
+            client_socket.send(file.read())  #binary type
+            file.close()
+        else :
+            header = 'HTTP/1.0 404 File Not Found\r\n\r\n'
+            client_socket.send((header+html).encode('utf-8'))
+    except Exception as e:
+        print(e)
+    client_socket.close()
+
+
+
+server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+server_socket.bind(('localhost', 80))
+server_socket.listen(0)
+print('listening...')
+
+while True :
+    client_socket, addr = server_socket.accept()
+    client_socket.settimeout(3)
+    print('accepting')
+    t = threading.Thread(target=httpprocess, args=(client_socket,))
+    t.start()
+```
+
+## python과 html 코딩
+
+코드를 섞어쓰면 불편하다.
+
+같은 파일에서 동작하도록 -> template 기능 사용
+
+- test2.py
+
+```python
+html = """
+<html>
+   <head>
+      <meta charset="utf-8">
+   </head>
+
+   <body>
+       <font color=red> @out</font>
+   </body>
+</html>
+"""
+
+html = html.replace("@out",  "제목출력")
+#template engine에서 실시간으로 바꿔준다.
+
+print(html)
+```
+
+`127.0.0.1/test2.py` 들어가면 `제목출력` 이 출력된다.
