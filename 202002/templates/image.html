@@ -1,6 +1,18 @@
-<h1>YOLO Image Gallery</h1>
-<br>
+<head>
+    <meta charset='utf-8'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+</head>
 
+<h1>YOLO Image Gallery</h1><br>
+<h2>File upload</h2><br>
+<form action = "/fileUpload" method="POST" enctype="multipart/form-data">
+    <input type="file" name="file1"><br>
+    제목 : <input type="text" name="title">
+    <input type="submit" value="전송">
+</form>
+
+
+<h2>Image list</h2>
 <table border="5">
     {% for s in listData %}
     <tr>

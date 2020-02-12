@@ -426,7 +426,7 @@ print(html)
 
 `127.0.0.1/test2.py` 들어가면 `제목출력` 이 출력된다.
 
-
+(200212)
 
 # HTTP
 
@@ -442,7 +442,7 @@ hyper: 건너 편의, 초월, 과도한
 
 
 
-문서의 구조
+- 문서의 구조
 
 기존 문서: 순차적, 서열형 구조
 
@@ -452,13 +452,11 @@ hyper: 건너 편의, 초월, 과도한
 
 
 
-Tags
+- Tags
 
 opening tags + closing tags 인데 closing tags가 없는 경우도 많다.
 
-
-
-CSS
+- CSS
 
 사용 이유: 명확성, 확장성, 유지보수 편의성으로 template과 같은 컨셉으로 분리하는 것이다.
 
@@ -504,17 +502,20 @@ AWS 포트 두개씩 필요. 하나는 주피터노트북, 하나는 서버
 
 
 
-Template 기반 Flask : 변수 공유
+## Template 기반 Flask : 변수 공유
+
+### render_template
 
 - .py
 
 ```python
+from flask import Flask, render_template
+app = Flask(__name__)
 
+@app.route('/')
+def index():
+    return render_template('home.html', htmlvariable=pyvariable)
 ```
-
-
-
-return render_template('home.html', name='홍길동')
 
 - .html
 
@@ -529,5 +530,91 @@ HTML에서 파이썬의 객체에 접근하려면 `{{변수}}` 를 사용한다.
     <li>이름은 {{s}}</li>
     {% endfor %}
 </ul>
+```
+
+#### 공유할 변수가 여러 개일 경우
+
+딕셔너리의 리스트로 자료를 저장한다.
+
+[ {}, {}, ...]
+
+```python
+#DB
+lista = ["book2.jpg", "dog.jpg", "single.jpeg"]
+listb = ['책데이터', '개영상테스트', '사람']
+# 여러 리스트를 딕셔너리로 합치기
+listData = []
+id = []
+for i in range(len(lista)):
+    id.append(int(i))
+    listData.append({'id': id[i], 'img': lista[i], 'title': listb[i]})
+```
+
+#### 갤러리와 이미지 디테일
+
+- gallery.html
+
+```python
+@app.route('/image')
+def image():
+    return render_template('image.html', listData=listData)
+```
+
+```html
+<table border="5">
+    {% for s in listData %}
+    <tr>
+        <td><a href="/view?id={{s.id}}"><img src='/static/{{s.img}}' width=100></a></td>
+        <td>{{s.title}}</td>
+    </tr>
+    {% endfor %}
+</table>
+```
+
+- view.html (이미지 상세보기)
+
+```python
+@app.route('/view')
+def view():
+    localid = request.args.get('id')
+    return render_template('view.html', s=listData[int(localid)])
+```
+
+```html
+<font size="20">{{s.title}}</font>
+<br>
+<img src="/static/{{s.img}}">
+<br>
+<a href="/image"><font size="10">목록으로</font></a>
+```
+
+
+
+### file-upload form
+
+- gallery.html
+
+```html
+<form action = "/fileUpload" method="POST" enctype="multipart/form-data">
+    <input type="file" name="file1"><br>
+    제목 : <input type="text" name="title">
+    <input type="submit" value="전송">
+</form>
+```
+
+메소드는 POST 필수
+
+enctype 설정도 필수. 부가적인 데이터도 같이 전송되기 때문에 multipart
+
+- .py
+
+```python
+@app.route('/fileUpload', methods=['POST'])
+def fileUpload() :
+    if request.method == 'POST' :                  #파일 업로드는 POST 방식만 가능
+        f =request.files['file1']                  #form에서의 변수
+        f.save('./static/downloads/' + f.filename)  #서버의 실제 물리적인 폴더 경로
+        title = request.form.get('title')
+        return '업로드 완료'
 ```
 
