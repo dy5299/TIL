@@ -6,10 +6,8 @@ lista = ["book2.jpg", "dog.jpg", "single.jpeg"]
 listb = ['책데이터', '개영상테스트', '사람']
 # 여러 리스트를 딕셔너리로 합치기
 listData = []
-ids = []
 for i in range(len(lista)):
-    ids.append(int(i))
-    listData.append({'id': ids[i], 'img': lista[i], 'title': listb[i]})
+    listData.append({'id': i, 'img': lista[i], 'title': listb[i]})
 
 
 def goURL(msg, url) :
@@ -44,14 +42,18 @@ def fileUpload() :
         f.save('./static/' + f.filename)  #서버의 실제 물리적인 폴더 경로
         title = request.form.get('title')
 
-        id = len(listData)
+        id = listData[-1]["id"] + 1
         listData.append({'id':id, 'img':f.filename, 'title':title})
     return goURL("업로드가 성공했습니다.","/image")
 
 @app.route('/delete')   #/delete?id=0
 def delete() :
-    id = request.args.get('id')
-    del listData[int(id)]
+    idx = -1
+    id = int(request.args.get('id'))
+    for i in range(len(listData)) :
+        if id == listData[i]["id"] :
+            idx = i
+    if idx >= 0 : del listData[idx]
     return goURL("데이터를 삭제하였습니다.","/image")
 
 
