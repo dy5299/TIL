@@ -618,3 +618,34 @@ def fileUpload() :
         return '업로드 완료'
 ```
 
+
+
+
+
+### javascript로 리턴
+
+```python
+def goURL(msg, url) :
+    html = f"""
+<script>
+    alert("@msg")
+    window.location.href = "@url"
+</script>
+    """ #위의 html은 단지 문자열일 뿐이다. 서버에서는 문자열을 리턴하고, 브라우저에서 html을 디코딩한다.
+    html = html.replace("@msg", msg)
+    html = html.replace("@url", url)
+    return html
+
+
+@app.route('/fileUpload', methods=['POST'])
+def fileUpload() :
+    if request.method == 'POST' :                  #파일 업로드는 POST 방식만 가능
+        f =request.files['file1']                  #form에서의 변수
+        f.save('./static/' + f.filename)  #서버의 실제 물리적인 폴더 경로
+        title = request.form.get('title')
+
+        id = len(listData)
+        listData.append({'id':id, 'img':f.filename, 'title':title})
+    return goURL("업로드가 성공했습니다.","/image")
+```
+

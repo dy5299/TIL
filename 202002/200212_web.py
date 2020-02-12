@@ -12,6 +12,18 @@ for i in range(len(lista)):
     listData.append({'id': ids[i], 'img': lista[i], 'title': listb[i]})
 
 
+def goURL(msg, url) :
+    html = f"""
+<script>
+    alert("@msg")
+    window.location.href = "@url"
+</script>
+    """ #위의 html은 단지 문자열일 뿐이다. 서버에서는 문자열을 리턴하고, 브라우저에서 html을 디코딩한다.
+    html = html.replace("@msg", msg)
+    html = html.replace("@url", url)
+    return html
+
+
 @app.route('/')
 def index():
     return render_template('home.html', title="my home page")
@@ -20,7 +32,7 @@ def index():
 def image():
     return render_template('image.html', listData=listData)
 
-@app.route('/view')
+@app.route('/view')     #/view?id=0
 def view():
     id = request.args.get('id')
     return render_template('view.html', s=listData[int(id)])
@@ -34,7 +46,16 @@ def fileUpload() :
 
         id = len(listData)
         listData.append({'id':id, 'img':f.filename, 'title':title})
-    return f"{f.filename} 파일을 {title} 제목으로 업로드 성공! <img src=/static/{f.filename}> <a href='/image'>뒤로가기</a>"
+    return goURL("업로드가 성공했습니다.","/image")
+
+@app.route('/delete')   #/delete?id=0
+def delete() :
+    id = request.args.get('id')
+    del listData[int(id)]
+    return goURL("데이터를 삭제하였습니다.","/image")
+
+
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=80, debug=True)
