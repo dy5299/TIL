@@ -1,9 +1,5 @@
 import cv2 as cv2
-import argparse
 import numpy as np
-import os.path
-from matplotlib import pyplot as plt
-import math
 
 # Initialize the parameters
 confThreshold = 0.5

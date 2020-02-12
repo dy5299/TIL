@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request
 import yolo
+import facedetection
 app = Flask(__name__)
 
 #DB
@@ -51,7 +52,8 @@ def fileUpload() :
 
     id = listData[-1]["id"] + 1
     listData.append({'id':id, 'img':f.filename, 'title':title})
-    yolo.detectObject('./static/' + f.filename)
+    #yolo.detectObject('./static/' + f.filename)
+    facedetection.detectObject('./static/' + f.filename)
     return goURL("업로드가 성공했습니다.","/image")
 
 @app.route('/delete')   #/delete?id=0
