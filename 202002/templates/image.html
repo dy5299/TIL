@@ -1,0 +1,12 @@
+<h1>YOLO Image Gallery</h1>
+<br>
+
+<table border="5">
+    {% for s in listData %}
+    <tr>
+        <td><a href="/view?id={{s.id}}"><img src='/static/{{s.img}}' width=100></a></td>
+        <td>{{s.title}}</td>
+    </tr>
+    {% endfor %}
+</table>
+

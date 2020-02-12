@@ -425,3 +425,109 @@ print(html)
 ```
 
 `127.0.0.1/test2.py` 들어가면 `제목출력` 이 출력된다.
+
+
+
+# HTTP
+
+HTTP Method: 웹서버에 요청하는 방식
+
+요청-응답(무조건 html)
+
+- HTTP = Hyper Text Markup Language
+
+hyper: 건너 편의, 초월, 과도한
+
+한 문서에서 다른 문서로 건너뛸 수 있는 텍스트.
+
+
+
+문서의 구조
+
+기존 문서: 순차적, 서열형 구조
+
+하이퍼텍스트 : 링크에 따라 그 차례가 바뀌는 임의적이면서 나열형 구조
+
+책과는 완전 다른 컨셉으로, 하이퍼링크로 연결된 문서들을 어떠한 행위(click)에 따라 자유롭게 이동
+
+
+
+Tags
+
+opening tags + closing tags 인데 closing tags가 없는 경우도 많다.
+
+
+
+CSS
+
+사용 이유: 명확성, 확장성, 유지보수 편의성으로 template과 같은 컨셉으로 분리하는 것이다.
+
+
+
+오늘 >> 스마트폰으로 촬영 - 업로드 - YOLO - 게시물처럼 관리, 리스트화
+
+AWS 포트 두개씩 필요. 하나는 주피터노트북, 하나는 서버
+
+
+
+- 모바일 지원 HTML
+  
+  - 모바일 viewport 지원
+  
+  ```html
+  <head>
+      <meta charset='utf-8'>
+      <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+  </head>
+  ```
+  
+  스마트폰에 맞춰서 scaling
+  
+  - 모바일 camera 지원
+  ```html
+  <input type='file' name='file1' accept='image/*' capture='camera'>
+  ```
+
+
+
+- python web server 구축
+  - SimpleHTTPServer
+
+  ```python
+  python -m http.server 9000
+  ```
+
+  - 스크립트 기반 웹서버
+  - Web Framework 기반 웹서버
+    - Flask : 경량 웹서버. 정말 기능이 없다
+    - Django : MVC 기반의 웹서버
+
+
+
+Template 기반 Flask : 변수 공유
+
+- .py
+
+```python
+
+```
+
+
+
+return render_template('home.html', name='홍길동')
+
+- .html
+
+HTML에서 파이썬의 객체에 접근하려면 `{{변수}}` 를 사용한다.
+
+`{% for %}`,` {% endfor %}` 사용해 반복처리
+
+```html
+<!--예시-->
+<ul>
+    {% for s in list %}
+    <li>이름은 {{s}}</li>
+    {% endfor %}
+</ul>
+```
+
