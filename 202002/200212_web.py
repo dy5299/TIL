@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request
+import yolo
 app = Flask(__name__)
 
 #DB
@@ -33,17 +34,24 @@ def image():
 @app.route('/view')     #/view?id=0
 def view():
     id = request.args.get('id')
-    return render_template('view.html', s=listData[int(id)])
+    #search
+    idx = -1
+    id = int(request.args.get('id'))
+    for i in range(len(listData)) :
+        if id == listData[i]["id"] :
+            idx=i
+    if idx>=0 :
+        return render_template('view.html', s=listData[idx])
 
 @app.route('/fileUpload', methods=['POST'])
 def fileUpload() :
-    if request.method == 'POST' :                  #파일 업로드는 POST 방식만 가능
-        f =request.files['file1']                  #form에서의 변수
-        f.save('./static/' + f.filename)  #서버의 실제 물리적인 폴더 경로
-        title = request.form.get('title')
+    f =request.files['file1']                  #form에서의 변수
+    f.save('./static/' + f.filename)  #서버의 실제 물리적인 폴더 경로
+    title = request.form.get('title')
 
-        id = listData[-1]["id"] + 1
-        listData.append({'id':id, 'img':f.filename, 'title':title})
+    id = listData[-1]["id"] + 1
+    listData.append({'id':id, 'img':f.filename, 'title':title})
+    yolo.detectObject('./static/' + f.filename)
     return goURL("업로드가 성공했습니다.","/image")
 
 @app.route('/delete')   #/delete?id=0
