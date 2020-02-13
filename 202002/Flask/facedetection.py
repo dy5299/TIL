@@ -9,12 +9,12 @@ import os
 from keras.models import load_model
 
 emotion_model_path = 'fer2013_big_XCEPTION.54-0.66.hdf5'
-predictor = dlib.shape_predictor("../../../../shape_predictor_68_face_landmarks.dat")
-ageProto = "../../../../agegender/age_deploy.prototxt"
-ageModel = "../../../../agegender/age_net.caffemodel"
+predictor = dlib.shape_predictor("../../../../../shape_predictor_68_face_landmarks.dat")
+ageProto = "../../../../../agegender/age_deploy.prototxt"
+ageModel = "../../../../../agegender/age_net.caffemodel"
 
-genderProto = "../../../../agegender/gender_deploy.prototxt"
-genderModel = "../../../../agegender/gender_net.caffemodel"
+genderProto = "../../../../../agegender/gender_deploy.prototxt"
+genderModel = "../../../../../agegender/gender_net.caffemodel"
 
 ageList = ['(0-2)', '(4-6)', '(8-12)', '(15-20)', '(25-32)', '(38-43)', '(48-53)', '(60-100)']
 genderList = ['Male', 'Female']
@@ -41,7 +41,7 @@ def preprocess_input(x, v2=True):
 
 
 
-def detectObject(file):
+def detectFace(file):
     frame = cv2.imread(file)
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     rects = detector(gray, 0)

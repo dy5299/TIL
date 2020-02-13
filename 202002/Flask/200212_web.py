@@ -53,7 +53,7 @@ def fileUpload() :
     id = listData[-1]["id"] + 1
     listData.append({'id':id, 'img':f.filename, 'title':title})
     #yolo.detectObject('./static/' + f.filename)
-    facedetection.detectObject('./static/' + f.filename)
+    facedetection.detectFace('./static/' + f.filename)
     return goURL("업로드가 성공했습니다.","/image")
 
 @app.route('/delete')   #/delete?id=0
@@ -70,4 +70,4 @@ def delete() :
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=80, debug=True)
+    app.run(host='0.0.0.0', port=4567, debug=True)
