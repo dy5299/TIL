@@ -1,5 +1,9 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.conf import settings
+import face
+
 
 def index(request):
     return HttpResponse("Main Django!!!")
@@ -25,16 +29,36 @@ def login(request):
         return redirect('/service')
     return redirect('/static/login.html')
 
+
 def logout(request):
     request.session['user']=''
     request.session.pop('user')
     return redirect('/static/login.html')
 
 
-
 def service(request):
     if request.session.get('user','') == '':
         return redirect('/static/login.html')
 
-    html = "Main Service<br>" + request.session.get('user') + "님 로그인되었습니다.<a href=/logout>로그아웃</a>"
+    html = "Main Service<br>" + request.session.get('user') + "님 로그인되었습니다.<br><a href=/logout>로그아웃</a>"
     return HttpResponse(html)
+
+@csrf_exempt
+def uploadimage(req):
+    file = req.FILES['file1']
+    filename = file._name
+    fp = open(settings.BASE_DIR + '/static/'+ filename, 'wb')
+    for chunk in file.chunks():
+        fp.write(chunk)
+    fp.close()
+
+    print(settings.BASE_DIR)
+
+    result = face.faceverifiation(settings.BASE_DIR + '/known.bin', settings.BASE_DIR + "/static/" + filename)[0]
+    print(result)
+    if result != "" :
+        req.session['user'] = result
+        return redirect('/service')
+    if file =="":
+        return HttpResponse("파일을 업로드해주세요.")
+    return redirect('/static/login.html')

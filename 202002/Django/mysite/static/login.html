@@ -4,13 +4,20 @@
 <body>
 
 
-
+<h2>Login</h2>
 <form action="/login" method="get">
     id <input type="text" name="id"><br>
     pwd <input type="text" name="pwd"><br>
     <input type="submit" value="로그인">
 </form>
 
+
+<h2>File upload</h2><br>
+<!--action="http://127.0.0.1:80/uploadimage" 하면 중간에 가로채기 가능-->
+<form action = "/uploadimage" method="POST" enctype="multipart/form-data">
+    <input type="file" name="file1"><br>
+    <input type="submit" value="얼굴 인증하기">
+</form>
 
 
 </body>
