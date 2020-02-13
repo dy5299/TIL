@@ -14,7 +14,7 @@ with open(classesFile, 'rt') as f:
     classes = f.read().rstrip('\n').split('\n')
 # Give the configuration and weight files for the model and load the network using them.
 modelConfiguration = "./yolov3.cfg"
-modelWeights = "../../../../yolov3.weights"
+modelWeights = "../../../../../yolov3.weights"
 
 net = cv2.dnn.readNetFromDarknet(modelConfiguration, modelWeights)
 net.setPreferableBackend(cv2.dnn.DNN_BACKEND_OPENCV)

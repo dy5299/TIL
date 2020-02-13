@@ -6,7 +6,6 @@ import cv2
 import matplotlib.pyplot as plt
 import face_recognition
 import os
-from imutils import paths
 from keras.models import load_model
 
 emotion_model_path = 'fer2013_big_XCEPTION.54-0.66.hdf5'
