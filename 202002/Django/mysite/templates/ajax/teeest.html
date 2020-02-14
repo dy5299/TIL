@@ -1,0 +1,43 @@
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+
+<div id="status">dddddddddddd</div>
+
+<script>
+    $("#status").html("<font color=red>안녕하세요</font>")
+</script>
+
+
+
+
+
+
+
+
+
+<script>
+    $(function() {
+        var bar = $('.bar');
+        var percent = $('.percent');
+        var status = $('#status');
+        $('form').ajaxForm({
+            beforeSend: function() {
+                status.empty();
+                var percentVal = '0%';
+                bar.width(percentVal);
+                percent.html(percentVal);
+            },
+            uploadProgress: function(event, position, total, percentComplete) {
+                var percentVal = percentComplete + '%';
+                bar.width(percentVal);
+                percent.html(percentVal);
+            },
+            complete: function(xhr) {
+               status.html("성공")
+            },
+           error:function(e){
+              status.html("실패")
+           }
+
+        });
+    });
+</script>

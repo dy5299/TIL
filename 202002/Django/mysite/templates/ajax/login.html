@@ -1,0 +1,30 @@
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
+    <script src="http://code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+</head>
+
+
+아이디 <input type="text" name="id" id="id"><br>
+암호 <input type="password" name="pwd" id="pwd"><br>
+<button id="btnLogin">로그인</button>
+
+
+<script>
+    $("#btnLogin").click(function() {
+        var param = {id:$("#id").val(), pwd:$("#pwd").val()};
+        $.get("/ajax/login", param, function(data) {
+            console.log(JSON.stringify(data));
+            $("#result").val(data.result);
+
+            if (data.error==0) location.href="/ajax"
+            else {
+                $("#id").focus();
+                $("#id").val("");
+                $("#pwd").val("");
+                alert(data.message);
+            }
+
+        });
+    });
+</script>
