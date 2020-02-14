@@ -1,0 +1,24 @@
+ <script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
+<script src="http://code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+
+<button id="btnAdd">추가</button><br>
+<div id="cells">
+    <div class="cell">
+        <textarea rows="10" cols="40" id="code"></textarea>
+        <button id="btnRun">실행</button>
+        <div class="result"> result </div>
+    </div>
+</div>
+
+<script>
+    $("#btnRun").click(function() {
+        var param = {code:$("#code").val()};
+        $.get("/ajax/runpython", param, function(data) {
+            $("#cells > .cell:nth-child > .result").html(data);        //.value에는 plain text밖에 못 들어가서 .html로
+        });
+    });
+
+    $("#btnAdd").click(function() {
+        $("#cells").append($(".cell").clone())
+    });
+</script>

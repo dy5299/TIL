@@ -2,6 +2,8 @@ from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
+import sys
+from io import StringIO
 
 
 def index(request):
@@ -50,3 +52,24 @@ def upload(request):
         fp.write(chunk)
     fp.close()
     return HttpResponse("UPLOAD")
+
+
+
+#runpython
+def runpythonform(request):
+    return render(request, "ajax/runpython.html")
+
+glo = {}
+loc = {}
+def runpython(request):
+    original_stdout = sys.stdout    #sys.stdout은 시스템 변수로 정해진 변수명이다.
+    sys.stdout = StringIO()         #강제로 standard output을 메모리로 바꾼다
+
+    code = request.GET['code']
+    exec(code, glo, loc)            #내부적으로 전역변수와 지역변수를 glo, loc에 저장함
+
+    contents = sys.stdout.getvalue()            #표준출력방향에서 value를 가져온다.
+    contents = contents.replace("\n","<br>")    #html에서는 엔터를 엔터로 출력하지 않고 <br>써줘야 엔터로 출력해줌
+    sys.stdout = original_stdout
+
+    return HttpResponse(contents)

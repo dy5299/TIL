@@ -17,8 +17,9 @@
             console.log(JSON.stringify(data));
             $("#result").val(data.result);
 
-            if (data.error==0) location.href="/ajax"
-            else {
+            if (data.error == 0) {
+                location.href="/ajax"
+            } else {
                 $("#id").focus();
                 $("#id").val("");
                 $("#pwd").val("");
