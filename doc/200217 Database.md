@@ -486,3 +486,49 @@ data.filter(  Q(age__gte=50) | Q(name__contains='유')  )
 model_instance = queryset.get(title='my title')
 ```
 
+
+
+
+
+
+
+### online DB 구현
+
+- myapp/views.py
+
+```python
+def listUser(request):
+    q = request.GET.get('q',"")         #default값 설정을 위해 .get() 사용. 자기 자신 호출.
+
+    if q == "" :
+        data = User.objects.all()
+    else:
+        data = User.objects.all().filter(name__contains=q)
+
+    return render(request, 'template2.html', {'data':data})
+```
+
+template로 넘겨주는 게 좋다, for문을 사용할 수 있으므로.
+
+- template2.html
+
+```html
+User List <br>
+
+{% for d in data %}
+    이름 {{d.name}}   age {{d.age}}<br>
+{% endfor %}
+
+<form action="" method="get">
+    <input type="text" name="q">
+    <input type="submit" value="검색">
+</form>
+```
+
+
+
+검색은 GET method, 추가는 POST method
+
+하나의 UI에서 get/post method 다르면 구분할 수 있다.
+
+form을 띄워주는 것은 GET 방식, form을 처리하는 것은 POST 방식으로 하여 url 경로명을 줄여나갈 수 있다. (보편적 trick)

@@ -2,7 +2,8 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
-import face
+import face, json
+from myapp.models import User
 
 
 def index(request):
@@ -62,3 +63,22 @@ def uploadimage(req):
     if file =="":
         return HttpResponse("파일을 업로드해주세요.")
     return redirect('/static/login.html')
+
+def listUser(request) :
+    if request.method == 'GET' :
+        q = request.GET.get('q',"")         #default값 설정을 위해 .get() 사용. 자기 자신 호출.
+        if q == "":
+            data = User.objects.all()
+        else:
+            data = User.objects.all().filter(name__contains=q)
+        return render(request, 'template2.html', {'data':data})
+
+    else :
+        userid = request.POST['userid']
+        name = request.POST['name']
+        age = request.POST['age']
+        hobby = request.POST['hobby']
+        u = User(userid=userid, name=name, age=age, hobby=hobby)
+        u.save()
+        #User.objects.create()
+        return redirect('/listuser')

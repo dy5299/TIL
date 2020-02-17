@@ -1,0 +1,21 @@
+User List <br>
+
+
+{% for d in data %}
+    이름 {{d.name}}   age {{d.age}}<br>
+{% endfor %}
+
+<form action="listuser">
+    <input type="text" name="q">
+    <input type="submit" value="검색">
+</form>
+
+
+<form action="listuser" method="post">
+    {% csrf_token %}
+    userid: <input type="text" name="userid">
+    name: <input type="text" name="name">
+    age: <input type="text" name="age">
+    hobby: <input type="text" name="hobby">
+    <input type="submit" value="Add">
+</form>
