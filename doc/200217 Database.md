@@ -463,8 +463,8 @@ python manage.py shell_plus --notebook
 #### Select / Filtering
 
 ```python
-queryset = 모델클래스명.objects.all()
-queryset = queryset.filter(조건필트1=조건값1, ...)
+data = 모델클래스명.objects.all()
+data = data.filter(조건필트1=조건값1, ...)
 data.filter(age__lte=50)	#less than or equal
 ```
 
@@ -483,16 +483,69 @@ data.filter(  Q(age__gte=50) | Q(name__contains='유')  )
 - get은 1개일때만 가능 (그 외는 예외 발생)
 
 ```python
-model_instance = queryset.get(title='my title')
+model_instance = data.get(title='my title')
+```
+
+#### Select / Ordering
+
+```python
+data = data.order_by('field1') # 지정 필드 오름차순 요청
+data = data.order_by('-field1') # 지정 필드 내림차순 요청
+data = data.order_by('field2', 'field3') # 1차기준, 2차기준
+```
+
+#### Insert
+
+- 필수필드 모두 지정해야한다. IntegrityError 발생
+- blank=True, null=True, 디폴트값이 지정된 필드는 제외
+- Model instance의 save함수로 저장
+- Model manager의 create 함수로 저장
+- 1:n 관계 생성
+
+```python
+model_instance = 모델클래스명(author=User.objects.all()[0], title='title', text='content')
+model_instance.save()
+
+new_post = 모델클래스명.objects.create(author=User.objects.get(id=1), title='title',
+text='content')
+```
+
+#### Update
+
+- Model Instance 속성을 변경하고, save 함수를 통해 저장
+
+```python
+post_instance = 모델클래스명.objects.get(id=66)
+post_instance.title = 'edit title' # title 수정
+post_instance.save()
+```
+
+- QuerySet의 update 함수에 업데이트할 속성값을 지정하여 일괄 수정
+
+```python
+data = 모델클래스명.objects.all()
+data.update(title='test title') # 일괄 update 요청
+```
+
+#### Delete
+
+- Model Instance 속성을 변경하고, save 함수를 통해 저장
+
+```python
+post_instance = 모델클래스명.objects.get(id=66)
+post_instance.delete()
+```
+
+- QuerySet의 delete 함수에 업데이트할 속성값을 지정하여 일괄 삭제
+
+```python
+data = 모델클래스명.objects.all()
+data.delete() # 일괄 delete 요청
 ```
 
 
 
-
-
-
-
-### online DB 구현
+### Online DB 구현
 
 - myapp/views.py
 

@@ -3,13 +3,14 @@
 <h2>User List </h2>
 
 {% for d in data %}
-    이름 {{d.name}}   age {{d.age}}<br>
+    이름 {{d.name}}   age {{d.age}}  <a href="listuser?userid={{d.userid}}">삭제</a><br>
 {% endfor %}
 
 <form action="listuser">
     <input type="text" name="q">
     <input type="submit" value="검색">
     <input type="button" id="add" value="+">
+    <!--pf) <button id="add">+</button>-->
 </form>
 
 <div id="layer">
