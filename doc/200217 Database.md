@@ -179,7 +179,7 @@ SQLite browser : 관리 툴.
 
 ```sql
 CREATE TABLE userTBL -- 회원 테이블 
-( userID CHAR(8) NOT NULL PRIMARY KEY, -- 사용자 아이디(PK)
+( userID CHAR(8) NOT NULL PRIMARY KEY, -- 사용자 아이디(PK) 
   userName VARCHAR(10) NOT NULL, -- 이름 
   birthYear INT NOT NULL, -- 출생 연도 
   addr CHAR(2) NOT NULL, -- 지역(경기, 서울, 경남 식으로 2글자만 입력) 
@@ -190,13 +190,13 @@ CREATE TABLE userTBL -- 회원 테이블
 );
 
 CREATE TABLE buyTBL -- 구매 테이블 
-( num INT AUTO_INCREMENT NOT NULL PRIMARY KEY, -- 순번(PK) 
+( num INTEGER   PRIMARY KEY AUTOINCREMENT, 
   userID CHAR(8) NOT NULL, -- 아이디(FK) 
   prodName CHAR(6) NOT NULL, -- 물품 
   groupName CHAR(4), -- 분류 
   price INT NOT NULL, -- 단가 
   amount SMALLINT NOT NULL, -- 수량 
-FOREIGN KEY (userID) REFERENCES userTBL (userID)
+  FOREIGN KEY (userID) REFERENCES userTBL (userID)
 );
 ```
 
@@ -254,7 +254,7 @@ SELECT addr, count(*) FROM userTBL GROUP BY addr
 - 데이터 등록
 
 ```sql
-INSERT INTO userTBL VALUES('KHD', '강호동', 1970, '경북', '011', '22222222', 182, '2017-7-7');
+INSERT INTO userTBL VALUES ('KHD', '강호동', 1970, '경북', '011', '2222', 182, '2007-7-7');
 INSERT INTO userTBL VALUES ('KKJ', '김국진', 1965, '서울', '019', '33333333', 171, '2009-9-9');
 INSERT INTO userTBL VALUES ('KYM', '김용만', 1967, '서울', '010', '44444444', 177, '2015-5-5');
 INSERT INTO userTBL VALUES ('KJD', '김제동', 1974, '경남', NULL , NULL, 173, '2013-3-3');
@@ -264,34 +264,225 @@ INSERT INTO userTBL VALUES ('LHJ', '이휘재', 1972, '경기', '011', '88888888
 INSERT INTO userTBL VALUES ('LKK', '이경규', 1960, '경남', '018', '99999999', 170, '2004-12-12');
 INSERT INTO userTBL VALUES ('PSH', '박수홍', 1970, '서울', '010', '00000000', 183, '2012-5-5');
 
-INSERT INTO buyTBL VALUES (1, 'KHD', '운동화', NULL, 30, 2);
-INSERT INTO buyTBL VALUES (2, 'KHD', '노트북', '전자', 1000, 1);
-INSERT INTO buyTBL VALUES (3, 'KYM', '모니터', '전자', 200, 1);
-INSERT INTO buyTBL VALUES (4, 'PSH', '모니터', '전자', 200, 5);
-INSERT INTO buyTBL VALUES (5, 'KHD', '청바지', '의류', 50, 3);
-INSERT INTO buyTBL VALUES (6, 'PSH', '메모리', '전자', 80, 10);
-INSERT INTO buyTBL VALUES (7, 'KJD', '책', '서적', 15, 5);
-INSERT INTO buyTBL VALUES (8, 'LHJ', '책', '서적', 15, 2);
-INSERT INTO buyTBL VALUES (9, 'LHJ', '청바지', '의류', 50, 1);
-INSERT INTO buyTBL VALUES (10, 'PSH', '운동화', NULL, 30, 2);
-INSERT INTO buyTBL VALUES (11, 'LHJ', '책', '서적', 15, 1);
-INSERT INTO buyTBL VALUES (12, 'PSH', '운동화', NULL, 30, 2);
+INSERT INTO buyTBL VALUES (NULL, 'KHD', '운동화', NULL, 30, 2);
+INSERT INTO buyTBL VALUES (NULL, 'KHD', '노트북', '전자', 1000, 1);
+INSERT INTO buyTBL VALUES (NULL, 'KYM', '모니터', '전자', 200, 1);
+INSERT INTO buyTBL VALUES (NULL, 'PSH', '모니터', '전자', 200, 5);
+INSERT INTO buyTBL VALUES (NULL, 'KHD', '청바지', '의류', 50, 3);
+INSERT INTO buyTBL VALUES (NULL, 'PSH', '메모리', '전자', 80, 10);
+INSERT INTO buyTBL VALUES (NULL, 'KJD', '책', '서적', 15, 5);
+INSERT INTO buyTBL VALUES (NULL, 'LHJ', '책', '서적', 15, 2);
+INSERT INTO buyTBL VALUES (NULL, 'LHJ', '청바지', '의류', 50, 1);
+INSERT INTO buyTBL VALUES (NULL, 'PSH', '운동화', NULL, 30, 2);
+INSERT INTO buyTBL VALUES (NULL, 'LHJ', '책', '서적', 15, 1);
+INSERT INTO buyTBL VALUES (NULL, 'PSH', '운동화', NULL, 30, 2);
 ```
 
 (auto increment 작동이 안 되어서 직접 값을 넣음)
 
 
 
+```sql
+SELECT userID, sum(price*amount) FROM buyTBL GROUP BY userID
+```
+
+
+
+- join
+
+2개 이상의 테이블을 묶어서 하나의 결과 테이블을 만드는 것.
+
+innerjoin
+
+```sql
+SELECT userTBL.userID, username, sum(amount), sum(amount*price) as total
+FROM userTBL, buyTBL 
+WHERE userTBL.userID = buyTBL.userID
+GROUP BY userTBL.userID, username
+ORDER BY total
+```
+
+userID는 두 테이블 모두에 있으므로 기준으로 할 테이블을 지정해줘야 오류가 안 난다.
+
+```python
+SELECT userTBL.userID, username, sum(amount), sum(amount*price) as total
+FROM userTBL as u, buyTBL as b
+WHERE u.userID = b.userID
+GROUP BY addr
+having total>170
+ORDER BY total
+
+```
 
 
 
 
 
-
-
+cf
 
 ```sql
 INSERT INTO userTBL VALUES
 ('YJS', '유재석', 1972, '서울', '010' , '1111111', 178, '2008-8-8');
+```
+
+
+
+- ORM
+
+Object Relation Model
+
+~
+
+
+
+## Django에 DB 사용하기
+
+```bash
+#관리자 및 user 생성
+python manage.py createsuperuser
+#mysite/settings.py 설정
+INSTALLED_APPS = [, ..., myapp]				#앱 추가
+```
+
+
+
+DB 관련 설정은 app별로 설정
+
+```python
+#model 클래스 생성 myapp/models.py
+from django.db import models
+
+
+class User(models.Model) :
+    userid = models.CharField(max_length=10, primary_key=True)
+    name = models.CharField(max_length=10)
+    age = models.IntegerField()
+    hobby = models.CharField(max_length=20)
+
+    def __str__(self):		#print 적용할 때 자동으로 적용되는 함수
+        return f"{self.userid} / {self.name} / {self.age}"
+
+
+#admin.py 수정
+from django.contrib import admin
+from myapp.models import User
+admin.site.register(User)
+```
+
+```python
+#myapp/apps.py 자동으로 생성되어있어
+from django.apps import AppConfig
+
+class MydbConfig(AppConfig):
+    name = 'mydb'
+```
+
+
+
+
+
+```bash
+#DB 변경사항 반영
+python manage.py makemigrations myapp		#변경사항 찾기 (이력관리)
+python manage.py migrate					#실제로 DB 만드는 작업
+```
+
+- class
+
+user와 상속받고싶은 부모를 써
+
+
+
+
+
+```bash
+python manage.py shell
+from myapp.models import User
+datas = User.objects.all()
+#객체 상속받아옴 #result
+#<QuerySet [<User: kim / 김유신 / 50>]>
+```
+
+
+
+```python
+u = User(userid='lee', name='임꺽정', age=40, hobby='봉사')
+u.save()
+```
+
+객체생성=레코드생성
+
+저장을 해줘야 해 = save함수 호출
+
+
+
+## Django - Jupyter notebook 연동
+
+```bash
+#downgrade and installation
+pip install django==2.0
+pip install django-extensions
+```
+
+settings.py 의 `INSTALLED_APPS = ['django_extensions', ...]` 추가
+
+```bash
+#실행
+python manage.py shell_plus --notebook
+```
+
+
+
+#### Model Manager
+
+- .objects
+- 데이터베이스 질의 인터페이스를 제공
+- 디폴트 manager로서 모델클래스 .objects가 제공된다.
+- model manager를 통해 해당 모델 클래스의 DB 데이터를 추가, 조회, 수정, 삭제가 가능하다.
+
+#### QuerySet
+
+- SQL을 생성해주는 인터펭시ㅡ
+- `.objects.all()` : 객체 상속
+
+- `objects.create()` : 객체생성+세이브 .실제 insert 함수
+
+- Chaining을 지원
+  
+- `.objects.filter(title_icontains='1').filter(title_endswith='3')`
+  
+- connection 모듈을 통해 queryset으로 만들어진 실제 sql문을 shell에서 확인
+
+  ```python
+  from django.db import connection
+  ModelCls.objects.all().order_by('-id')[:10]
+  connection.queries[-1]
+  ```
+
+
+#### Select / Filtering
+
+```python
+queryset = 모델클래스명.objects.all()
+queryset = queryset.filter(조건필트1=조건값1, ...)
+data.filter(age__lte=50)	#less than or equal
+```
+
+```python
+data.filter(name__icontains='김')		#ignore 대소문자
+data.filter(name__contains='김')			#대소문자 구분
+```
+
+- or 조건
+
+```python
+#from django.db.models import Q
+data.filter(  Q(age__gte=50) | Q(name__contains='유')  )
+```
+
+- get은 1개일때만 가능 (그 외는 예외 발생)
+
+```python
+model_instance = queryset.get(title='my title')
 ```
 
