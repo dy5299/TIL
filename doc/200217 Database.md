@@ -497,38 +497,69 @@ model_instance = queryset.get(title='my title')
 - myapp/views.py
 
 ```python
-def listUser(request):
-    q = request.GET.get('q',"")         #default값 설정을 위해 .get() 사용. 자기 자신 호출.
+def listUser(request) :
+    if request.method == 'GET' :
+        q = request.GET.get('q',"")         #default값 설정을 위해 .get() 사용. 자기 자신 호출.
+        if q == "":
+            data = User.objects.all()
+        else:
+            data = User.objects.all().filter(name__contains=q)
+        return render(request, 'template2.html', {'data':data})
 
-    if q == "" :
-        data = User.objects.all()
-    else:
-        data = User.objects.all().filter(name__contains=q)
-
-    return render(request, 'template2.html', {'data':data})
+    else :
+        userid = request.POST['userid']
+        name = request.POST['name']
+        age = request.POST['age']
+        hobby = request.POST['hobby']
+        u = User(userid=userid, name=name, age=age, hobby=hobby)
+        u.save()
+        #User.objects.create()
+        return redirect('/listuser')
 ```
 
 template로 넘겨주는 게 좋다, for문을 사용할 수 있으므로.
 
+
+
 - template2.html
 
 ```html
-User List <br>
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+
+<h2>User List </h2>
 
 {% for d in data %}
     이름 {{d.name}}   age {{d.age}}<br>
 {% endfor %}
 
-<form action="" method="get">
+<form action="listuser">
     <input type="text" name="q">
     <input type="submit" value="검색">
+    <input type="button" id="add" value="+">
 </form>
+
+<div id="layer">
+    <form action="listuser" method="post">
+        {% csrf_token %}
+        userid: <input type="text" name="userid">
+        name: <input type="text" name="name">
+        age: <input type="text" name="age">
+        hobby: <input type="text" name="hobby">
+        <input type="submit" value="Add">
+    </form>
+</div>
+
+<script>
+    $("#layer").hide()				//처음에 안 보이게
+    $("#add").click( function() {
+        $("#layer").toggle()
+    });
+</script>
 ```
-
-
 
 검색은 GET method, 추가는 POST method
 
 하나의 UI에서 get/post method 다르면 구분할 수 있다.
 
 form을 띄워주는 것은 GET 방식, form을 처리하는 것은 POST 방식으로 하여 url 경로명을 줄여나갈 수 있다. (보편적 trick)
+

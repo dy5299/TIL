@@ -1,5 +1,6 @@
-User List <br>
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
 
+<h2>User List </h2>
 
 {% for d in data %}
     이름 {{d.name}}   age {{d.age}}<br>
@@ -8,14 +9,23 @@ User List <br>
 <form action="listuser">
     <input type="text" name="q">
     <input type="submit" value="검색">
+    <input type="button" id="add" value="+">
 </form>
 
+<div id="layer">
+    <form action="listuser" method="post">
+        {% csrf_token %}
+        userid: <input type="text" name="userid">
+        name: <input type="text" name="name">
+        age: <input type="text" name="age">
+        hobby: <input type="text" name="hobby">
+        <input type="submit" value="Add">
+    </form>
+</div>
 
-<form action="listuser" method="post">
-    {% csrf_token %}
-    userid: <input type="text" name="userid">
-    name: <input type="text" name="name">
-    age: <input type="text" name="age">
-    hobby: <input type="text" name="hobby">
-    <input type="submit" value="Add">
-</form>
+<script>
+    $("#layer").hide()              //처음에 안보이게
+    $("#add").click( function() {
+        $("#layer").toggle()
+    });
+</script>
