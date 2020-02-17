@@ -552,12 +552,20 @@ data.delete() # 일괄 delete 요청
 ```python
 def listUser(request) :
     if request.method == 'GET' :
-        q = request.GET.get('q',"")         #default값 설정을 위해 .get() 사용. 자기 자신 호출.
-        if q == "":
-            data = User.objects.all()
-        else:
-            data = User.objects.all().filter(name__contains=q)
+        delid = request.GET.get('userid', '')
+        if delid != '':
+            User.objects.all().get(userid=delid).delete()           #GET은 결과값이 하나일 때만 가능
+            #User.objects.all().filter(userid=delid)[0].delete()    #필터는 결과값이 여러개도 가능
+            return redirect('/listuser')
+
+        data = User.objects.all()
+        q = request.GET.get('q','')         #default값 설정을 위해 .get() 사용. 자기 자신 호출.
+        if q != "":
+            data = data.filter(name__contains=q)
+
         return render(request, 'template2.html', {'data':data})
+
+
 
     else :
         userid = request.POST['userid']
