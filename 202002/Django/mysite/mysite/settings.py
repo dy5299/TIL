@@ -39,8 +39,11 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django_extensions',
     'myapp',
-    'mydb'
+    'mydb',
+    'blog'
 ]
+
+#INSTALLED_APPS += ['blog']          #updated 관점을 표현해주기위해 이렇게 쓰기도 함
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
