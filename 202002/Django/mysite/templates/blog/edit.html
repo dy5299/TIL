@@ -1,7 +1,8 @@
-<meta http-equiv="content-type" content="text/html; charset=utf-8">
-
-<form action="{% url 'edit' pk %}" method="post">
-{% csrf_token %}
-    {{ form.as_p }}
-    <input type="submit" value="작성">
-</form>
+{% extends 'blog/base.html' %}
+{% block content %}
+    <form action="{% url 'edit' pk %}" method="post">
+    {% csrf_token %}
+        {{ form.as_p }}
+        <input type="submit" value="작성">
+    </form>
+{% endblock %}

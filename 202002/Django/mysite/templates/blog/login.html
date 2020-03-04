@@ -1,5 +1,3 @@
-<meta http-equiv="content-type" content="text/html; charset=utf-8">
-
 <form action="{% url 'login' %}" method="post">    <!--action 빼면 자기 자신, url이라는 명령어 뒤 name-->
 {% csrf_token %}
     username <input type="text" name="username"><br>

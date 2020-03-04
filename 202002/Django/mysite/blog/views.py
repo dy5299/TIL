@@ -52,7 +52,8 @@ class LoginView(View):
 
 class PostView(View):
     def get(self, request):
-        return render(request, "blog/edit.html")
+        username = request.session['username']
+        return render(request, "blog/add.html", {'username':username})
 
     def post(self, request):
         title = request.POST.get('title')

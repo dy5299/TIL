@@ -1,0 +1,10 @@
+{% extends 'blog/base.html' %}
+{% block content %}
+    <form action="{% url 'add' %}" method="post">
+    {% csrf_token %}
+        제목  <input type="text" name="title" /><br>
+        내용  <textarea rows="10" cols="30" name="text"></textarea>
+
+        <input type="submit" value="작성">
+    </form>
+{% endblock %}
