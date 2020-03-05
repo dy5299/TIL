@@ -49,7 +49,7 @@ class LoginView(View):
         return redirect('list')
 
 
-
+'''
 class PostView(View):
     def get(self, request):
         username = request.session['username']
@@ -62,9 +62,34 @@ class PostView(View):
         user = User.objects.get(username=username)
         Post.objects.create(title=title, text=text, author=user)    #create:생성과 동시에 save
         return redirect('list')
+'''
 
 
 
+class PostEditView(View):
+    def get(self, request, pk):     #특정 포스트를 수정하므로 pk parameter를 받아와야 한다.
+        #초기값 지정
+        if pk == 0 :
+            form = PostForm()       #empty form
+        else :
+            post = get_object_or_404(Post, pk=pk)
+            form = PostForm(initial={'title':post.title, 'text':post.text})     #초기값을 post form으로 채움
+        return render(request, "blog/edit.html", {'form':form, 'pk':pk})
+
+    def post(self, request, pk):
+        form = PostForm(request.POST)       #받은 데이터로 폼 채움
+        if form.is_valid():
+            if pk == 0:
+                username = request.session["username"]
+                user = User.objects.get(username=username)
+                Post.objects.create(title=form['title'].value(), text=form['text'].value(), author=user)
+            else:
+                post = get_object_or_404(Post, pk=pk)
+                post.title = form['title'].value()
+                post.text = form['text'].value()
+                post.publish()
+            return redirect('list')
+        return render(request, 'blog/edit.html', {'form':form, 'pk':pk})
 
 def validator(value):
     if len(value) < 5 : raise ValidationError("길이가 너무 짧아요");
@@ -72,22 +97,3 @@ def validator(value):
 class PostForm(Form):
     title = CharField(label='제목', max_length=20, validators=[validator])
     text = CharField(label='내용', widget=Textarea)
-
-class PostEditView(View):
-    def get(self, request, pk):     #특정 포스트를 수정하므로 pk parameter를 받아와야 한다.
-        #초기값 지정
-        post = get_object_or_404(Post, pk=pk)
-        form = PostForm(initial={'title':post.title, 'text':post.text})
-        return render(request, "blog/edit.html", {'form':form, 'pk':pk})
-
-    def post(self, request, pk):
-        form = PostForm(request.POST)
-        if form.is_valid():
-            post = get_object_or_404(Post, pk=pk)
-            post.title = form['title'].value()
-            post.text = form['text'].value()
-            post.publish()
-            return redirect('list')
-        return render(request, 'blog/edit.html', {'form':form, 'pk':pk})
-
-
