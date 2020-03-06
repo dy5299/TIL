@@ -74,6 +74,7 @@ class PostEditView(View):
         else :
             post = get_object_or_404(Post, pk=pk)
             form = PostForm(initial={'title':post.title, 'text':post.text})     #초기값을 post form으로 채움
+            #post와 form을 강제로 mapping시킴.
         return render(request, "blog/edit.html", {'form':form, 'pk':pk})
 
     def post(self, request, pk):
@@ -83,9 +84,10 @@ class PostEditView(View):
                 username = request.session["username"]
                 user = User.objects.get(username=username)
                 Post.objects.create(title=form['title'].value(), text=form['text'].value(), author=user)
+                #form과 model data를 강제로 mapping
             else:
                 post = get_object_or_404(Post, pk=pk)
-                post.title = form['title'].value()
+                post.title = form['title'].value()  #form과 model data를 강제로 mapping
                 post.text = form['text'].value()
                 post.publish()
             return redirect('list')
