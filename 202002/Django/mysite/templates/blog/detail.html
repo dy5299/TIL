@@ -6,7 +6,7 @@
 {{d.title}}<hr>
 {{d.text|linebreaks}}
 
-<br><a href="{% url 'edit' d.pk %}">수정</a>
-<br><a href="/blog/list">목록 보기</a>
+<br><a href="{% url 'board' d.pk 'edit' %}">수정</a>
+<br><a href="{% url 'board' 0 'list' %}">목록 보기</a>
 
 {% endblock %}

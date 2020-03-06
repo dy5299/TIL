@@ -2,10 +2,10 @@
 {% block content %}
 
 
-<a href="{% url 'edit' 0 %}">글쓰기</a><br>
+<a href="{% url 'board' 0 'add'%}">글쓰기</a><br>
 <h2>글 리스트</h2>
 {% for d in data %}
-    <a href="{% url 'detail' d.pk %}">{{d.title}}</a><br>
+    <a href="{% url 'board' d.pk 'detail'%}">{{d.title}}</a><br>
     <hr>
 {% endfor %}
 

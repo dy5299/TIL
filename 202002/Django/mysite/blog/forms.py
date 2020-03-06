@@ -1,4 +1,4 @@
-from blog.models import Post
+from . import models
 from django.forms import Form, CharField, Textarea, ValidationError
 from django import forms
 
@@ -10,7 +10,7 @@ class PostForm(forms.ModelForm):
     #    title = CharField(label='제목', max_length=20, validators=[validator])
     #    text = CharField(label='내용', widget=Textarea)
     class Meta:
-        model = Post    #model은 쟝고가 정의한 것. 에다 model data를 넣어준다
+        model = models.Post    #model은 쟝고가 정의한 것. 에다 model data를 넣어준다
         fields = ['title', 'text']      #가져올 fields만 선택 가능하다.
 
     def __init__(self, *args, **kwargs):                    #내 생성자 정의

@@ -17,7 +17,7 @@
 {% endif %}
 
 
-<form method="post">    <!--trick:  action="{% url 'edit' pk %}"  지움. 자기 자신을 호출.-->
+<form method="post">
 {% csrf_token %}
     {{ form.as_p }}
     <input type="submit" value="작성">
