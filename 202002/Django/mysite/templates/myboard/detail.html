@@ -73,8 +73,8 @@
                 <div class="bvc_txt">{{d.text|linebreaks}}</div>
             </div>
 
-{% if d.image != None %}
-이미지 : <img src="{{d.image}}" />
+{% if d.image != "" %}
+이미지주소 : {{d.image}}
 {% else %}
 첨부된 이미지 없음
 {% endif %}

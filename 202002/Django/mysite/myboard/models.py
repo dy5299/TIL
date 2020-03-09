@@ -10,7 +10,7 @@ class Board(models.Model):
     published_date = models.DateTimeField(
         blank=True, null=True) #  필드가 폼에서 빈 채로 저장되는 것을 허용
     cnt = models.IntegerField(default=0)            #조회수
-    image = models.CharField(max_length=200, null=True, blank=True)     #이미지는 필수 아님
+    image = models.ImageField(null=True, blank=True)     #이미지는 필수 아님
     category = models.CharField(max_length=10, default='common')
 
     def __str__(self):
