@@ -1,0 +1,26 @@
+{% extends 'myboard/base.html' %}
+{% block content %}
+<style>
+     .bg { background-color: #eeeeee; }
+     .bd { border: 1px solid #666666; }
+</style>
+<script>
+   $("#id_title").addClass('bg bd');
+</script>
+
+
+
+{% if form.title.value %}
+<h2>수정하기</h2>
+{% else %}
+<h2>신규작성</h2>
+{% endif %}
+
+
+<form method="post">
+{% csrf_token %}
+    {{ form.as_p }}
+    <input type="submit" value="작성">
+</form>
+
+{% endblock %}

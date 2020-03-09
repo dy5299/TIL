@@ -1,0 +1,60 @@
+{% extends 'myboard/base.html' %}
+{% block content %}
+<style>
+/* board list */
+.board_list {margin-top:8px;}
+.board_list * {vertical-align:middle;}
+.board_list table {table-layout:fixed; width:100%; border-top:1px solid #333;}
+.board_list table th,
+.board_list table td {border-bottom:1px solid #ddd; text-align:center;}
+.board_list table td.ta_l {text-align:left;}
+.board_list table th {font-size:13px; line-height:21px; font-weight:500; letter-spacing:-0.048em; padding:10px; color:#222; background:#f8f8f8;}
+.board_list table td {font-size:14px; line-height:22px; padding:10px; color:#444;}
+.board_list .bl_link {color:#222;}
+.board_list .bl_link:hover {color:##580078;}
+.board_list .tag {margin:-2px 0; margin-right:4px;}
+.board_list .btn {margin:-2px 0;}
+.board_list .ico_lock {display:inline-block; width:18px; height:18px; background:url(../image/sub_cmn/sub_cmn_icon.png) no-repeat 0 0;}
+.board_list .ico_new {display:inline-block; width:18px; height:18px; background:url(../image/sub_cmn/sub_cmn_icon.png) no-repeat -20px 0;}
+.board_list .ico_file {display:inline-block; width:18px; height:18px; background:url(../image/sub_cmn/sub_cmn_icon.png) no-repeat -40px 0;}
+.board_list .no_list {padding:64px 0;}
+
+</style>
+
+<a href="{% url 'myboard' category 0 'add'%}">글쓰기</a><br>
+
+
+<h2>글 리스트</h2>
+
+<div class="board_list">
+    <table>
+        <colgroup>
+            <col stype="width:32px">
+            <col stype="width:100px">
+            <col>
+            <col stype="width:64px">
+            <col>
+        </colgroup>
+        <thead>
+        <tr>
+            <th>번호</th>
+            <th>카테고리</th>
+            <th>제목</th>
+            <th>조회수</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for d in data %}
+        <tr>
+            <td>{{d.pk}}</td>
+            <td>{{d.category}}</td>
+            <td><a href="{% url 'myboard' category d.pk 'detail'%}">{{d.title}}</a></td>
+            <td>{{d.cnt}}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+
+{% endblock %}

@@ -1,0 +1,88 @@
+{% extends 'myboard/base.html' %}
+{% block content %}
+<style>
+/* board view */
+.board_view {;}
+.board_view .bv_top .bv_ttl {border-bottom:1px solid #d7d7d7; padding:25px 20px;}
+.board_view .bv_top .bv_ttl * {vertical-align:middle;}
+.board_view .bv_top .bv_ttl h4 {display:inline; font-size:16px; line-height:24px; font-weight:500; letter-spacing:-0.048em; color:#000; word-wrap:break-word; word-break:keep-all;}
+.board_view .bv_top .bv_ttl .tag {margin:-2px 8px -2px 0;}
+.board_view .bv_top .bv_category {border-bottom:1px solid #d7d7d7; font-size:0; line-height:0;}
+.board_view .bv_top .bv_category ul {padding:12px 20px;}
+.board_view .bv_top .bv_category ul li {position:relative; display:inline-block; padding:0 12px 0 8px;}
+.board_view .bv_top .bv_category ul li::before {display:block; content:''; width:2px; height:2px; border-radius:1px; background:#222; position:absolute; left:0; top:10px;}
+.board_view .bv_top .bv_category ul li * {vertical-align:middle;}
+.board_view .bv_top .bv_category ul li span {display:inline-block; font-size:14px; line-height:22px; color:#444; padding-right:4px;}
+.board_view .bv_top .bv_category ul li .bvc_ttl {color:#000;}
+.board_view .bv_top .bv_category ul li a.ico_email {display:inline-block; width:18px; height:18px; background:url(../image/sub_cmn/sub_cmn_icon.png) no-repeat -60px 0;}
+.board_view .bv_top .bv_category ul li span.ico_email {font-size:0; line-height:0; color:transparent; padding-right:0;}
+.board_view .bv_content {padding:12px 20px; border-bottom:1px solid #d7d7d7; position:relative; word-wrap:break-word; word-break:keep-all;}
+.board_view .bv_content .bvc_txt p {display:block; font-size:14px; line-height:22px; color:#333; word-wrap:break-word; word-break:keep-all; padding:6px 0;}
+.board_view .bv_content .bvc_txt strong {font-weight:bold;}
+.board_view .bv_content .bvc_txt img {display:block; max-width:800px; margin:6px auto;}
+.board_view .bv_file {position:relative; border-bottom:1px solid #d7d7d7;}
+.board_view .bv_file > div {padding:12px 20px;}
+.board_view .bv_file .bvf_ttl {position:absolute; left:0; top:0;}
+.board_view .bv_file .bvf_ttl span {position:relative; display:block; font-size:14px; line-height:22px; color:#000; padding:2px 0 2px 8px;}
+.board_view .bv_file .bvf_ttl span::before {display:block; content:''; width:2px; height:2px; border-radius:1px; background:#222; position:absolute; left:0; top:12px;}
+.board_view .bv_file .bvf_lst {padding-left:96px;}
+.board_view .bv_file .bvf_lst li {padding:2px 0; font-size:0; line-height:0;}
+.board_view .bv_file .bvf_lst li .btn_xs {vertical-align:middle;}
+.board_view .bv_file .bvf_lst .btn_bvf_viewer {padding-left:2px; background:#005599; color:#fff;}
+.board_view .bv_file .bvf_lst .btn_bvf_viewer > i { display:inline-block; margin:3px; width:12px; height:12px; line-height:13px; background:url(../image/sub_cmn/sub_tb_fileopen.gif) no-repeat 0 0;vertical-align:middle;}
+.board_view .bv_file .bvf_link {font-size:14px; line-height:22px; color:#444; background-image:url(../image/sub_cmn/sub_cmn_icon.png); background-repeat:no-repeat; padding:0 0 0 24px; word-wrap:break-word; word-break:keep-all; background-position:-160px -217px; vertical-align:middle; margin-right:6px;}
+.board_view .bv_file .bvf_link:hover {color:##580078;}
+.board_view .bv_file .bvf_link.ico_hwp {background-position:-380px 3px;}
+.board_view .bv_file .bvf_link.ico_wrd {background-position:-360px -17px;}
+.board_view .bv_file .bvf_link.ico_xls {background-position:-340px -37px;}
+.board_view .bv_file .bvf_link.ico_ppt {background-position:-320px -57px;}
+.board_view .bv_file .bvf_link.ico_pdf {background-position:-300px -77px;}
+.board_view .bv_file .bvf_link.ico_swf {background-position:-280px -97px;}
+.board_view .bv_file .bvf_link.ico_mda {background-position:-260px -117px;}
+.board_view .bv_file .bvf_link.ico_gif {background-position:-240px -137px;}
+.board_view .bv_file .bvf_link.ico_jpg {background-position:-220px -157px;}
+.board_view .bv_file .bvf_link.ico_zip {background-position:-200px -177px;}
+.board_view .bv_file .bvf_link.ico_txt {background-position:-180px -197px;}
+
+</style>
+<h2>게시물 보기</h2>
+
+
+<div id="content" class="content">
+    <div>
+        <div class="sub_top">category : {{category}}</div>
+        <div class="board_view">
+            <div class="bv_top">
+                <div class="bv_ttl">
+                    <h3>{{d.title}}</h3>
+                </div>
+                <div class="bv_category">
+                    <ul>
+                        <li>
+                            <span class="bvc_ttl">작성일 :</span>
+                            <span class="bvc_detail">{{d.created_date}}</span>
+                        </li>
+                        <li>
+                            <span class="bvc_ttl">조회수 :</span>
+                            <span class="bvc_detail">{{d.cnt}}</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="bv_content">
+                <div class="bvc_txt">{{d.text|linebreaks}}</div>
+            </div>
+
+{% if d.image != None %}
+이미지 : <img src="{{d.image}}" />
+{% else %}
+첨부된 이미지 없음
+{% endif %}
+        </div>
+    </div>
+</div>
+
+<br><a href="{% url 'myboard' category d.pk 'edit' %}">수정</a>
+<br><a href="{% url 'myboard' category 0 'list' %}">목록 보기</a>
+
+{% endblock %}
