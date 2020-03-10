@@ -21,6 +21,7 @@
 {% csrf_token %}
     {{ form.as_p }}
     <input type="submit" value="작성">
+    <input type="hidden" name="page" value="돌아갈페이지">
 </form>
 
 {% endblock %}

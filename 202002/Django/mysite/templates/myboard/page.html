@@ -1,0 +1,36 @@
+{% extends 'myboard/base.html' %}
+{% block content %}
+
+{% for data in datas %}
+    {{data.id}} / {{data.name}}<br>
+{% endfor %}
+
+
+{% if datas.has_other_pages %}
+    {% if datas.has_previous %}
+        <a href="?page={{ datas.previous_page_number }}">이전페이지</a>
+    {% else %}
+        <span>이전페이지</span>
+    {% endif %}
+
+
+    {% for i in datas.paginator.page_range %}
+        {% if datas.number == i %}
+            <span>{{ i }}</span>
+        {% else %}
+            <a href="?page={{ i }}">{{ i }}</a>
+        {% endif %}
+    {% endfor %}
+
+
+    {% if datas.has_next %}
+        <a href="?page={{ datas.next_page_number }}">다음페이지</a>
+    {% else %}
+        <span>다음페이지</span>
+    {% endif %}
+
+{% endif %}
+
+
+
+{% endblock %}

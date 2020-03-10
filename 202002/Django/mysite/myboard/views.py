@@ -1,8 +1,9 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.views.generic import View
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
+from django.core.paginator import Paginator
 
 from . import models
 from . import forms
@@ -33,7 +34,6 @@ class LoginView(View):
 
 
 
-
 class BoardView(View):
     def get(self, request, pk, mode, category):     #특정 포스트를 수정하므로 pk parameter를 받아와야 한다.
         if mode == 'list':
@@ -43,7 +43,12 @@ class BoardView(View):
                 data = models.Board.objects.all().filter(author=user)
             else :
                 data = models.Board.objects.all().filter(author=user, category=category)
-            context = {"data": data, 'username': username, 'category':category}
+
+            page = request.GET.get('page', 1)
+            p = Paginator(data, 3)  # collection 형태의 데이터면 상관 없다 / page 당 개수
+            sub = p.page(page)
+
+            context = {"datas": sub, 'username': username, 'category':category}
             return render(request, apps.APP+"/list.html", context)
 
         elif mode == 'detail':
@@ -68,7 +73,7 @@ class BoardView(View):
         username = request.session["username"]
         user = User.objects.get(username=username)
 
-        if pk == 0:
+        if mode == 'add':
                 form = forms.BoardForm(request.POST)       #받은 데이터로 폼 채움
         else:
                 post = get_object_or_404(models.Board, pk=pk)
@@ -83,3 +88,43 @@ class BoardView(View):
                 post.publish()
             return redirect('myboard', category, 0, 'list')
         return render(request, apps.APP+'/edit.html', {'form':form})
+
+'''
+# paging unit test
+def page(request):
+    datas = [{'id': 1, 'name': '홍길동1'},
+             {'id': 2, 'name': '홍길동2'},
+             {'id': 3, 'name': '홍길동3'},
+             {'id': 4, 'name': '홍길동4'},
+             {'id': 5, 'name': '홍길동5'},
+             {'id': 6, 'name': '홍길동6'},
+             {'id': 7, 'name': '홍길동7'}, ]  # list
+    page = request.GET.get('page',1)
+    p = Paginator(datas,3)      #collection 형태의 데이터면 상관 없다 / page 당 개수
+    sub = p.page(page)
+
+    return render(request, apps.APP + "/page.html", {'datas': sub})
+'''
+
+def ajaxdel(request):
+    pk = request.GET.get('pk')
+    board = models.Board.objects.get(pk=pk)
+    #board.delete()
+    return JsonResponse({'error':'0'})
+
+def ajaxget(request):
+    username = request.session["username"]
+    user = User.objects.get(username=username)
+
+
+    page = request.GET.get('page',1)
+    datas = models.Board.objects.all().filter(author=user, category='common')
+
+    page = int(page)
+    subs = datas[(page-1)*3:(page)*3]
+    '''p = Paginator(datas, 3)
+    subs = p.page(page)'''
+
+    datas = {'datas': [{'pk': sub.pk, 'title': sub.title, 'cnt': sub.cnt} for sub in subs]}
+    return JsonResponse(datas)
+

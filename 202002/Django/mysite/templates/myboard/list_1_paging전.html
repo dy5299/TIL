@@ -37,14 +37,14 @@
         </colgroup>
         <thead>
         <tr>
-            <th>글번호</th>
+            <th>번호</th>
             <th>카테고리</th>
             <th>제목</th>
             <th>조회수</th>
         </tr>
         </thead>
         <tbody>
-        {% for d in datas %}
+        {% for d in data %}
         <tr>
             <td>{{d.pk}}</td>
             <td>{{d.category}}</td>
@@ -55,34 +55,6 @@
         </tbody>
     </table>
 </div>
-
-
-<!--navigation-->
-{% if datas.has_other_pages %}
-    {% if datas.has_previous %}
-        <a href="?page={{ datas.previous_page_number }}">Previous</a>
-    {% else %}
-        <span>Previous</span>
-    {% endif %}
-
-
-    {% for i in datas.paginator.page_range %}
-        {% if datas.number == i %}
-            <span>{{ i }}</span>
-        {% else %}
-            <a href="?page={{ i }}">{{ i }}</a>
-        {% endif %}
-    {% endfor %}
-
-
-    {% if datas.has_next %}
-        <a href="?page={{ datas.next_page_number }}">Next</a>
-    {% else %}
-        <span>Next</span>
-    {% endif %}
-{% endif %}
-
-
 
 
 {% endblock %}
