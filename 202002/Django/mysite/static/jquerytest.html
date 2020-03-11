@@ -3,13 +3,14 @@
     <script src="http://code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
 
 
-<button id="btnAdd">추가해</button>
+<button id="btnAdd">모어모어</button>
 
 
 <div id="view">
     <div id="item">
         <a href="list?id=4"><span id="title">제목~~~~~~~~~</span></a>
         조회수 <span id="cnt">0</span>
+        <a id="del" href="javascript:deleteBoard(1)">삭제하기</a>
     </div>
 </div>
 
@@ -24,19 +25,23 @@
     var page = 1
 
     function getPage(page) {
-        json = {"datas": [{"pk": 1, "title": "\uae00\uc81c\ubaa911111", "cnt": 15}, {"pk": 2, "title": "\uae00\uc81c\ubaa922222", "cnt": 6}, {"pk": 3, "title": "\uc774\ubbf8\uc9c0\ud14c\uc2a4\ud2b8", "cnt": 25}]};
+        $.get("/myboard/ajaxget", {page:page}, function(json) {
+            console.log(JSON.stringify(json));
 
-        for (i=0; i<json.datas.length; i++) {
-            //console.log(json.datas[i].title);
-            item = $("#item").clone();
-            item.show();
-            $("#title", item).html(json.datas[i].title);
-            $("#cnt", item).text(json.datas[i].cnt);
-            $("#view").append(item);
-        }
+            if (json.datas.length == 0) alert("마지막 페이지");
+            for (i=0; i<json.datas.length; i++) {
+                //console.log(json.datas[i].title);
+                item = $("#item").clone();
+                item.show();
+                item.attr("id", "item_"+json.datas[i].pk);
+                $("#title", item).html(json.datas[i].title);
+<!--                $("#title", item).attr("href", json.datas[i].pk );-->
+                $("#cnt", item).text(json.datas[i].cnt);
+                $("#del", item).attr("href","javascript:deleteBoard(" + json.datas[i].pk + ")" );
+                $("#view").append(item);
+            }
+        });
     }
-
-
 
 
     $("#btnAdd").click( function() {
@@ -45,9 +50,12 @@
 
     getPage(page);
 
+    function deleteBoard(pk) {
+        $.get("/myboard/ajaxdel", {pk:pk}, function(json) {
+            $("#item_"+pk).remove();
+        })
+    }
 
-    $.get("/myboard/ajaxget", {page:1}, function(json) {
-        console.log(JSON.stringify(json));
-    });
+
 
 </script>

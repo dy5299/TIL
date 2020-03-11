@@ -89,6 +89,7 @@ class BoardView(View):
             return redirect('myboard', category, 0, 'list')
         return render(request, apps.APP+'/edit.html', {'form':form})
 
+
 '''
 # paging unit test
 def page(request):
@@ -126,5 +127,7 @@ def ajaxget(request):
     subs = p.page(page)'''
 
     datas = {'datas': [{'pk': sub.pk, 'title': sub.title, 'cnt': sub.cnt} for sub in subs]}
-    return JsonResponse(datas)
+    return JsonResponse(datas, json_dumps_params={'ensure_ascii':False})
+    #마지막 JsonResponse 뒤에 옵션은, json만 출력했을 때 한글이 제대로 보이도록 하는 옵션이다.
+    #자바스크립트가 알아서 인코딩하므로 없어도 상관 없다.
 
