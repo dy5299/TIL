@@ -1,0 +1,31 @@
+
+
+<h2>글 리스트</h2>
+
+<div class="board_list">
+    <table>
+        <colgroup>
+            <col stype="width:32px">
+            <col stype="width:100px">
+            <col>
+            <col stype="width:64px">
+            <col>
+        </colgroup>
+        <thead>
+        <tr>
+            <th>제목</th>
+            <th>조회수</th>
+            <th>이름</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for d in datas %}
+        <tr>
+            <td>{{d.title}}</td>
+            <td>{{d.cnt}}</td>
+            <td>{{d.username}}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>

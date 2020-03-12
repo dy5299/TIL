@@ -8,4 +8,5 @@ urlpatterns = [
     path('login/', views.LoginView.as_view(), name='login_board'),
     path('<category>/<int:pk>/<mode>/', views.BoardView.as_view(), name='myboard'),
     #path('', lambda request: redirect('myboard', 'common', 0, 'list')),
+    path('<category>/<int:page>', views.listsql),
 ]

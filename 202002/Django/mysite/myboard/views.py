@@ -131,3 +131,31 @@ def ajaxget(request):
     #마지막 JsonResponse 뒤에 옵션은, json만 출력했을 때 한글이 제대로 보이도록 하는 옵션이다.
     #자바스크립트가 알아서 인코딩하므로 없어도 상관 없다.
 
+
+from django.db import connection
+def dictfetchall(cursor):
+    desc = cursor.description
+    return [
+        dict(zip([col[0] for col in desc], row))
+        for row in cursor.fetchall()
+    ]
+
+def listsql(request, category, page):
+    username = request.session["username"]
+
+    # data
+    cursor = connection.cursor()
+    cursor.execute(f"""
+    select b.id, title, cnt, username, category
+    from myboard_board b, auth_user u
+    where b.author_id = u.id and username='{username}' and category='{category}'
+    """)
+    datas = dictfetchall(cursor)
+
+    #    page = request.GET.get('page', 1)
+    # page
+    page = int(page)
+    subs = datas[(page - 1) * 3:(page) * 3]
+    context = {'datas': [{'title': sub['title'], 'cnt': sub['cnt'], 'username': sub['username']} for sub in subs]}
+
+    return render(request, 'myboard/mylistsql.html', context)
