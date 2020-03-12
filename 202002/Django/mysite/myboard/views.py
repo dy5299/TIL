@@ -110,7 +110,7 @@ def page(request):
 def ajaxdel(request):
     pk = request.GET.get('pk')
     board = models.Board.objects.get(pk=pk)
-    #board.delete()
+    board.delete()
     return JsonResponse({'error':'0'})
 
 def ajaxget(request):
