@@ -146,16 +146,14 @@ def listsql(request, category, page):
     # data
     cursor = connection.cursor()
     cursor.execute(f"""
-    select b.id, title, cnt, username, category
+    select b.id, title, cnt, username
     from myboard_board b, auth_user u
     where b.author_id = u.id and username='{username}' and category='{category}'
     """)
     datas = dictfetchall(cursor)
 
-    #    page = request.GET.get('page', 1)
-    # page
     page = int(page)
     subs = datas[(page - 1) * 3:(page) * 3]
-    context = {'datas': [{'title': sub['title'], 'cnt': sub['cnt'], 'username': sub['username']} for sub in subs]}
+    context = {'datas': subs}
 
     return render(request, 'myboard/mylistsql.html', context)

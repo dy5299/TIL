@@ -19,3 +19,4 @@ class Board(models.Model):
     def publish(self):
         self.published_date = timezone.now()        #수정된 날짜
         self.save()
+
