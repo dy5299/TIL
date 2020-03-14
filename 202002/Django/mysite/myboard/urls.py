@@ -9,4 +9,6 @@ urlpatterns = [
     path('<category>/<int:pk>/<mode>/', views.BoardView.as_view(), name='myboard'),
     #path('', lambda request: redirect('myboard', 'common', 0, 'list')),
     path('<category>/<int:page>', views.listsql),
+    path('gallery', views.gallery),
+    path('upload', views.upload),
 ]

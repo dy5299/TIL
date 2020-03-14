@@ -4,12 +4,15 @@ from django.views.generic import View
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
 from django.core.paginator import Paginator
+from django.core.files.uploadedfile import SimpleUploadedFile
 
 from . import models
 from . import forms
 from . import apps
 
 # Create your views here.
+from mysite import settings
+
 
 def index(request):
     return HttpResponse("INDEX. OKOKOK")
@@ -157,3 +160,47 @@ def listsql(request, category, page):
     context = {'datas': subs}
 
     return render(request, 'myboard/mylistsql.html', context)
+
+def gallery(request):
+    username = request.session["username"]
+
+    #data
+    cursor = connection.cursor()
+    sql = f"""
+    select filename
+    from myboard_image
+    where author_id = ( select id from auth_user where username='{username}' )
+    """
+    cursor.execute(sql)
+
+    data = dictfetchall(cursor)
+    context = {'data': data, 'username': username}
+
+    return render(request, 'myboard/gallery.html', context)
+
+def upload(request):
+    username = request.POST['username']
+
+    #file upload
+    # f = open(filename, 'rb')
+    # file_upload = SimpleUploadedFile(filename, f.read(), content_type='image/jpeg')
+
+    #file save
+    file = request.FILES['filename']
+    filename = file._name
+    print(filename)
+    fp = open(settings.BASE_DIR + "/static/faces/" + username + '/' + filename, "wb")
+    for chunk in file.chunks():
+        fp.write(chunk)
+    fp.close()
+
+    #db insert
+    sql = f"""
+    INSERT INTO myboard_image (author_id, filename) VALUES (
+    (SELECT id from auth_user where username='{username}'), '{filename}');
+    """
+    cursor = connection.cursor()
+    cursor.execute(sql)
+    data = dictfetchall(cursor)
+    #return render(request, "myboard/gallery.html", )
+    return redirect('/myboard/gallery')

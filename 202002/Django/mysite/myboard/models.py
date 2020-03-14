@@ -20,3 +20,8 @@ class Board(models.Model):
         self.published_date = timezone.now()        #수정된 날짜
         self.save()
 
+'''
+class Image(models.Model):
+    author = models.ForeignKey('auth.User', on_delete=models.CASCADE)
+    filename = models.CharField(max_length=50)
+'''
