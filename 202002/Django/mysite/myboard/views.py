@@ -9,9 +9,8 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from . import models
 from . import forms
 from . import apps
-
+from django.conf import settings
 # Create your views here.
-from mysite import settings
 
 
 def index(request):
@@ -181,10 +180,6 @@ def gallery(request):
 def upload(request):
     username = request.POST['username']
 
-    #file upload
-    # f = open(filename, 'rb')
-    # file_upload = SimpleUploadedFile(filename, f.read(), content_type='image/jpeg')
-
     #file save
     file = request.FILES['filename']
     filename = file._name
@@ -202,5 +197,4 @@ def upload(request):
     cursor = connection.cursor()
     cursor.execute(sql)
     data = dictfetchall(cursor)
-    #return render(request, "myboard/gallery.html", )
     return redirect('/myboard/gallery')
