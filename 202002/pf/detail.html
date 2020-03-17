@@ -1,0 +1,10 @@
+{% extends 'blog/base.html' %}
+
+게시물 보기 <br>
+
+{% block content %}
+
+{{d.title}}  <br>
+{{d.text|linebreaks}}
+
+{% endblock %}

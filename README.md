@@ -2,41 +2,65 @@
 
 > 매일 배운 내용을 정리합니다.
 
-## 1. git
+## 1. Programming Basic
 
-* [git 기초](./git.md)
-* [마크다운 활용](./markdown.md)
+### 1. GIT
 
-```bash
-$ git status
-On branch master
-Your branch is up to date with 'origin/master'.
+* GIT 특강
+* GIT push-pull 과정에서 오류 해결 방법
+* GIT 주요 명령어 정리
+* Markdown 문법
 
-Untracked files:
-  (use "git add <file>..." to include in what will be committed)
-        README.md
+### 2. Python Basic
 
-nothing added to commit but untracked files present (use "git add" to track)
+- Anaconda Install
+- Jupyter Notebook
+- Formatting
+- pandas, numpy, matplotlib
+- 회귀분석
+- 파이썬에서의 _ (underbar)
+- 파이썬 자료형
+- 0과 Null
+- ravel과 flatten의 차이점
+- tuple 사용법
+- Varification and Validation
+- Virtual Environment Settings in Pycharm
 
-$ git add .
 
-$ git commit -m 'Add README.md'
-[master 87ae314] Add README.md
- 1 file changed, 0 insertions(+), 0 deletions(-)
- create mode 100644 README.md
 
-$ git push origin master
-Enumerating objects: 4, done.
-Counting objects: 100% (4/4), done.
-Delta compression using up to 12 threads
-Compressing objects: 100% (2/2), done.
-Writing objects: 100% (3/3), 340 bytes | 340.00 KiB/s, done.
-Total 3 (delta 0), reused 0 (delta 0)
-To https://github.com/dy5299/TIL.git
-   549744b..87ae314  master -> master
-```
 
 ## 2. Python
 
+### 1. Crawling
 
+### 2. Computer Vision
 
+- 디지털 영상 처리
+- 이미지 프로세싱
+
+### 3. Deep Learning
+
+- CNN
+- Haar, HOG, YOLO
+- Face Aanalysis
+- LoadKerasCV
+
+### 4. Chatbot Service
+
+- Kakao Chatbot Service
+
+### 5. NLP
+
+- 자연어 처리
+- RNN
+- LSTM
+- Word Embedding
+
+### 6. Django
+
+- WebServer
+- Django
+- Django Projects Settings in Pycharm
+- Database
+- Django 게시판 만들기
+- ORM (Object Relational Model)
