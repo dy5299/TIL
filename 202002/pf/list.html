@@ -1,9 +1,0 @@
-{% extends 'blog/base.html' %}
-
-{% block content %}
-
-{%  for d in data %}
-<a href="{{d.pk}}/detail" > {{d.title}} </a> <br>
-{% endfor %}
-
-{% endblock %}
